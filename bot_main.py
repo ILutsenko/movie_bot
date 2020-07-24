@@ -81,6 +81,66 @@ def key_advanced():
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
+    if payload == 23 or payload == 24:
+        """Выбор года для начального и конечного года"""
+
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('1989', VkKeyboardColor.PRIMARY, payload=201)
+        keyboard.add_button('1990', VkKeyboardColor.PRIMARY, payload=202)
+        keyboard.add_button('1991', VkKeyboardColor.PRIMARY, payload=203)
+        keyboard.add_button('1992', VkKeyboardColor.PRIMARY, payload=204)
+        keyboard.add_line()
+        keyboard.add_button('1993', VkKeyboardColor.PRIMARY, payload=205)
+        keyboard.add_button('1994', VkKeyboardColor.PRIMARY, payload=206)
+        keyboard.add_button('1995', VkKeyboardColor.PRIMARY, payload=207)
+        keyboard.add_button('1996', VkKeyboardColor.PRIMARY, payload=208)
+        keyboard.add_line()
+        keyboard.add_button('1997', VkKeyboardColor.PRIMARY, payload=209)
+        keyboard.add_button('1998', VkKeyboardColor.PRIMARY, payload=210)
+        keyboard.add_button('1999', VkKeyboardColor.PRIMARY, payload=211)
+        keyboard.add_button('2000', VkKeyboardColor.PRIMARY, payload=212)
+        keyboard.add_line()
+        keyboard.add_button('2001', VkKeyboardColor.PRIMARY, payload=213)
+        keyboard.add_button('2002', VkKeyboardColor.PRIMARY, payload=214)
+        keyboard.add_button('2003', VkKeyboardColor.PRIMARY, payload=215)
+        keyboard.add_button('2004', VkKeyboardColor.PRIMARY, payload=216)
+        keyboard.add_line()
+        keyboard.add_button('Следующая страница', VkKeyboardColor.DEFAULT, payload=99)
+        keyboard.add_line()
+        keyboard.add_button('Меню поиска', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+
+    if payload == 99:
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('2005', VkKeyboardColor.PRIMARY, payload=217)
+        keyboard.add_button('2006', VkKeyboardColor.PRIMARY, payload=218)
+        keyboard.add_button('2007', VkKeyboardColor.PRIMARY, payload=219)
+        keyboard.add_button('2008', VkKeyboardColor.PRIMARY, payload=220)
+        keyboard.add_line()
+        keyboard.add_button('2009', VkKeyboardColor.PRIMARY, payload=221)
+        keyboard.add_button('2010', VkKeyboardColor.PRIMARY, payload=222)
+        keyboard.add_button('2011', VkKeyboardColor.PRIMARY, payload=223)
+        keyboard.add_button('2012', VkKeyboardColor.PRIMARY, payload=224)
+        keyboard.add_line()
+        keyboard.add_button('2013', VkKeyboardColor.PRIMARY, payload=225)
+        keyboard.add_button('2014', VkKeyboardColor.PRIMARY, payload=226)
+        keyboard.add_button('2015', VkKeyboardColor.PRIMARY, payload=227)
+        keyboard.add_button('2016', VkKeyboardColor.PRIMARY, payload=228)
+        keyboard.add_line()
+        keyboard.add_button('2017', VkKeyboardColor.PRIMARY, payload=229)
+        keyboard.add_button('2018', VkKeyboardColor.PRIMARY, payload=230)
+        keyboard.add_button('2019', VkKeyboardColor.PRIMARY, payload=231)
+        keyboard.add_line()
+        keyboard.add_button('Предыдущая страница', VkKeyboardColor.PRIMARY, payload=23)
+        keyboard.add_line()
+        keyboard.add_button('Меню поиска', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+
+
     elif payload == 20:
         """Продвинутый поиск - изменение рейтинга """
 
@@ -276,6 +336,7 @@ min_year = 2000
 max_year = 2020
 genre_id = 'Не выбран'
 second_genre_id = 'Не выбран'
+pemp = 'none'
 
 for event in longpoll.listen():
     if event.type == VkBotEventType.MESSAGE_NEW:
@@ -415,6 +476,32 @@ for event in longpoll.listen():
                                                      ' кнопки с цифрами, если Вы решили изменить свое решение',
                          keyboard=keyboard2)
 
+        if payload == 23:
+            keyboard_func = key_advanced()
+            pemp = 'start'
+            send_message(peer_id=peer_id_in, message='Окей, выбираем минимальный год: ',
+                         keyboard=keyboard_func)
+        elif payload == 24:
+            keyboard_func = key_advanced()
+            pemp = 'end'
+            send_message(peer_id=peer_id_in, message='Окей, выбираем максимальный год: ',
+                         keyboard=keyboard_func)
+
+
+        if payload in [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219,
+                       220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231]:
+            if pemp == 'start':
+                min_year = payload + 1788
+                send_message(peer_id=peer_id_in, message=f'Минимальный год успешно выбран - {min_year}')
+            elif pemp == 'end':
+                max_year = payload + 1788
+                send_message(peer_id=peer_id_in, message=f'Максимальный год успешно выбран - {max_year}')
+
+        if payload == 99:
+            keyboard_func = key_advanced()
+            send_message(peer_id=peer_id_in, message='Открываем следующую страницу: ',
+                         keyboard=keyboard_func)
+
         # Изменяем рейтинг
         elif payload == 20:
             send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6, а '
@@ -470,14 +557,16 @@ for event in longpoll.listen():
                 min_rating = payload - 38
                 send_message(peer_id=peer_id_in,
                              message=f'Минимальный рейтинг успешно изменен на {min_rating}\n'
-                                     f'Можно вернуться в меню поиска чтобы настроить остальные фильтры',
+                                     f'Можно вернуться в меню поиска чтобы настроить остальные фильтры или выбрать '
+                                     f'рейтинг еще раз из этого меню, просто нажав на цифру',
                              keyboard=keyboard2)
 
             elif temp == 'max':
                 max_rating = payload - 38
                 send_message(peer_id=peer_id_in,
                              message=f'Максимальный рейтинг успешно изменен на {max_rating}\n'
-                                     f'Можно вернуться в меню поиска чтобы настроить остальные фильтры',
+                                     f'Можно вернуться в меню поиска чтобы настроить остальные фильтры или выбрать '
+                                     f'рейтинг еще раз из этого меню, просто нажав на цифру',
                              keyboard=keyboard2)
         if payload == 55:
                 try:
@@ -502,12 +591,14 @@ for event in longpoll.listen():
         if payload == 54:
             send_message(peer_id=peer_id_in,
                          message=f'В этом меню можно выбрать как будут отображаться фильмы или сериалы сверху - вниз\n'
-                                 f'Сортировка по году - от выбранного Вами года, например 2020,'
-                                 f' до выбранного минимального года, например 2015.\n\n'
-                                 f'Сортировка по рейтингу выстроит фильмы или сериалы по рейтингу, от большего рейтинга'
+                                 f'1) Сортировка по году - от выбранного Вами года, например от 2020,'
+                                 f' до выбранного минимального года, например до 2015.\n\n'
+                                 f'2) Сортировка по рейтингу выстроит фильмы или сериалы по рейтингу, от'
+                                 f' большего рейтинга'
                                  f'к меньшиму.\n\n'
-                                 f'Сортировка по году отсортирует для каждого года по рейтингу, так же сверху вниз.\n\n'
-                                 f'Сортировка по количеству голосов - соответственно сверху вниз',
+                                 f'3) Сортировка по году и рейтингу отсортирует для каждого года'
+                                 f' по рейтингу, так же сверху вниз.\n\n'
+                                 f'4) Сортировка по количеству голосов - соответственно сверху вниз',
                          keyboard=keyboard2)
 
         if payload == 56:
