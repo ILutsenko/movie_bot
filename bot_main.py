@@ -140,15 +140,32 @@ def key_advanced():
         return keyboard.get_keyboard()
 
     if payload == 54:
+        """Продвинутый поиск - выбор сортировки"""
         keyboard = VkKeyboard(one_time=False)
-        keyboard.add_button('По году', payload=1, color=VkKeyboardColor.PRIMARY)
-        keyboard.add_button('По рейтингу', VkKeyboardColor.PRIMARY, payload=2)
+        keyboard.add_button('По году', payload=70, color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('По рейтингу', VkKeyboardColor.PRIMARY, payload=71)
         keyboard.add_line()
-        keyboard.add_button('По году и рейтингу', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_button('По году и рейтингу', VkKeyboardColor.PRIMARY, payload=72)
         keyboard.add_line()
-        keyboard.add_button('По кол-ву голосов imdb', VkKeyboardColor.PRIMARY, payload=4)
+        keyboard.add_button('По кол-ву голосов imdb', VkKeyboardColor.PRIMARY, payload=73)
         keyboard.add_line()
         keyboard.add_button('Назад в меню поиска', VkKeyboardColor.DEFAULT, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+
+    if payload == 100:
+        """Топ 100 - меню выбора"""
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('Топ 100 по всем жанрам', VkKeyboardColor.PRIMARY, payload=61)
+        keyboard.add_line()
+        keyboard.add_button('Топ 100 по одному жанру', VkKeyboardColor.PRIMARY, payload=64)
+        keyboard.add_line()
+        keyboard.add_button('Топ 100 по рейтингу', VkKeyboardColor.PRIMARY, payload=62)
+        keyboard.add_line()
+        keyboard.add_button('Топ 100 по году и рейтингу', VkKeyboardColor.PRIMARY, payload=63)
+        keyboard.add_line()
+        keyboard.add_button('Топ 100 сериалов', VkKeyboardColor.PRIMARY, payload=65)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -158,14 +175,14 @@ def start_menu():
     """Главное меню - начало диалога или любое сообщение """
 
     if payload is None or payload == 0:
-        keyboard = VkKeyboard(one_time=False)
+        keyboard = VkKeyboard(one_time=True)
         keyboard.add_button('Я уже знаю что посмотреть', payload=1, color=VkKeyboardColor.PRIMARY)
         keyboard.add_line()
         keyboard.add_button('Я хочу выбрать рандомно', VkKeyboardColor.PRIMARY, payload=2)
         keyboard.add_line()
         keyboard.add_button('Продвинутый поиск', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
-        keyboard.add_button('Топ 100 фильмов\сериалов по жанрам', VkKeyboardColor.PRIMARY, payload=4)
+        keyboard.add_button('Топ 100 фильмов\сериалов по жанрам', VkKeyboardColor.PRIMARY, payload=100)
         return keyboard.get_keyboard()
 
     if payload == 1:
@@ -200,12 +217,7 @@ def start_menu():
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
-    elif payload == 4:
-        """Главное меню - топ 100 по жанрам"""
-
-        pass
-
-    if payload == 5 or payload == 6 or payload == 21 or payload == 56:
+    if payload == 5 or payload == 6 or payload == 21 or payload == 56 or payload == 64:
         """Цифры для выбора категории"""
 
         keyboard = VkKeyboard(one_time=False)
@@ -301,6 +313,26 @@ for event in longpoll.listen():
             send_message(peer_id=peer_id_in, message='В меню продвинутого поиска: ',
                          keyboard=keyboard)
 
+        elif payload == 100:
+            temp = 'top100'
+            send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
+                                                     f'{category_list}',
+                         keyboard=keyboard)
+
+        if payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'top100':
+            key_advanced = key_advanced()
+            genre_id_for_top_100 = payload - 6
+            send_message(peer_id=peer_id_in, message='Жанр для топ 100 успешно выбран:\n', keyboard=key_advanced)
+
+        # Отображение топ 100 фильмов
+        if payload == 61 or payload == 62 or payload == 63:
+            if payload == 61:
+                pass
+            elif payload == 62:
+                pass
+            else:
+                pass
+
         # Выбор жанра
         elif payload == 5 or payload == 6:
             temp = 'basic'
@@ -310,7 +342,7 @@ for event in longpoll.listen():
             film_or_serial = payload
 
         # Если ответ на выбор жанра правильный и есть в списке
-        if payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp != 'for_21':
+        if payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'basic':
             genre_id = payload - 6
 
             # Подбор рандомного фильма
@@ -448,12 +480,24 @@ for event in longpoll.listen():
                                      f'Можно вернуться в меню поиска чтобы настроить остальные фильтры',
                              keyboard=keyboard2)
         if payload == 55:
-            send_message(peer_id=peer_id_in,
-                         message=f'Рейтинг от {min_rating} до {max_rating}\n'
-                                 f'Год от {min_year} до {max_year}\n'
-                                 f'Жанр - {list_of_genres[genre_id]["Genre name"]}\n'
-                                 f'Второй жанр - {list_of_genres[second_genre_id]["Genre name"]}',
-                         keyboard=keyboard2)
+                try:
+                    genre_id = int(genre_id)
+                    genre_id_for_answer = list_of_genres[genre_id]["Genre name"]
+                except:
+                    genre_id_for_answer = 'Не выбран'
+
+                try:
+                    second_genre_id = int(second_genre_id)
+                    second_genre_id_for_answer = list_of_genres[second_genre_id]['Genre name']
+                except:
+                    second_genre_id_for_answer = 'Не выбран'
+
+                send_message(peer_id=peer_id_in,
+                             message=f'Рейтинг от {min_rating} до {max_rating}\n'
+                                     f'Год от {min_year} до {max_year}\n'
+                                     f'Жанр - {genre_id_for_answer}\n'
+                                     f'Второй жанр - {second_genre_id_for_answer}',
+                             keyboard=keyboard2)
 
         if payload == 54:
             send_message(peer_id=peer_id_in,
@@ -476,7 +520,7 @@ for event in longpoll.listen():
         elif payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'for_56':
             second_genre_id = payload - 6
             send_message(peer_id=peer_id_in,
-                         message=f'Второй жанр был успешно выбран - {list_of_genres[genre_id]["Genre name"]}.\n\n'
+                         message=f'Второй жанр был успешно выбран - {list_of_genres[second_genre_id]["Genre name"]}.\n\n'
                                  'При выборе жанра можно несколько раз нажимать на указанные'
                                  ' кнопки с цифрами, если Вы решили изменить свое решение',
                          keyboard=keyboard2)
