@@ -6,6 +6,7 @@ import mysql.connector
 import random
 from bot_genres import category_list, list_of_genres
 from datetime import datetime
+from kinopoisk.movie import Movie
 
 
 def actors_producers_genres(film_id):
@@ -67,6 +68,76 @@ def send_message(peer_id, message=None, attachment=None, keyboard=None, payload=
                               attachment=attachment, keyboard=keyboard, payload=payload)
 
 
+def key_advanced():
+    if payload == 19:
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('Начальный год', VkKeyboardColor.PRIMARY, payload=23)
+        keyboard.add_button('Конечный год', VkKeyboardColor.PRIMARY, payload=24)
+        keyboard.add_line()
+        keyboard.add_button('Ничего не менять', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+    elif payload == 20:
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('Мин. рейтинг', VkKeyboardColor.PRIMARY, payload=25)
+        keyboard.add_button('Макс. рейтинг', VkKeyboardColor.PRIMARY, payload=26)
+        keyboard.add_line()
+        keyboard.add_button('Ничего не менять', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+
+    elif payload == 21:
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload=27)
+        keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload=28)
+        keyboard.add_button('3', VkKeyboardColor.PRIMARY, payload=29)
+        keyboard.add_button('4', VkKeyboardColor.PRIMARY, payload=30)
+        keyboard.add_line()
+        keyboard.add_button('5', VkKeyboardColor.PRIMARY, payload=31)
+        keyboard.add_button('6', VkKeyboardColor.PRIMARY, payload=32)
+        keyboard.add_button('7', VkKeyboardColor.PRIMARY, payload=33)
+        keyboard.add_button('8', VkKeyboardColor.PRIMARY, payload=34)
+        keyboard.add_line()
+        keyboard.add_button('9', VkKeyboardColor.PRIMARY, payload=35)
+        keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload=36)
+        keyboard.add_button('11', VkKeyboardColor.PRIMARY, payload=37)
+        keyboard.add_button('12', VkKeyboardColor.PRIMARY, payload=38)
+        keyboard.add_line()
+        keyboard.add_button('Вернуться к поиску', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+
+    if payload == 25 or payload == 26:
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload=39)
+        keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload=40)
+        keyboard.add_button('3', VkKeyboardColor.PRIMARY, payload=41)
+        keyboard.add_button('4', VkKeyboardColor.PRIMARY, payload=42)
+        keyboard.add_line()
+        keyboard.add_button('5', VkKeyboardColor.PRIMARY, payload=43)
+        keyboard.add_button('6', VkKeyboardColor.PRIMARY, payload=44)
+        keyboard.add_button('7', VkKeyboardColor.PRIMARY, payload=45)
+        keyboard.add_button('8', VkKeyboardColor.PRIMARY, payload=46)
+        keyboard.add_line()
+        keyboard.add_button('9', VkKeyboardColor.PRIMARY, payload=47)
+        keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload=48)
+        keyboard.add_line()
+        keyboard.add_button('Ничего не менять', VkKeyboardColor.DEFAULT, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+
+    if payload in [39, 40, 41, 42, 43, 44, 45, 46, 47, 48]:
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('Вернуться к  поиску', VkKeyboardColor.PRIMARY, payload=20)
+        keyboard.add_line()
+        keyboard.add_button('Вернуться в начало', VkKeyboardColor.PRIMARY, payload=20)
+        return keyboard.get_keyboard()
+
+
 def start_menu():
     if payload == None or payload == 0:
         keyboard = VkKeyboard(one_time=False)
@@ -77,8 +148,6 @@ def start_menu():
         keyboard.add_button('Продвинутый поиск', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
         keyboard.add_button('Топ 100 фильмов\сериалов по жанрам', VkKeyboardColor.PRIMARY, payload=4)
-        keyboard.add_line()
-        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.PRIMARY, payload=0)
         return keyboard.get_keyboard()
 
     if payload == 1:
@@ -93,28 +162,20 @@ def start_menu():
         return keyboard.get_keyboard()
 
     elif payload == 3:
-        pass
-
-    elif payload == 4:
         keyboard = VkKeyboard(one_time=False)
-        keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload=19)
-        keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload=20)
-        keyboard.add_button('3', VkKeyboardColor.PRIMARY, payload=21)
-        keyboard.add_button('4', VkKeyboardColor.PRIMARY, payload=22)
+        keyboard.add_button('Выбрать год', VkKeyboardColor.PRIMARY, payload=19)
         keyboard.add_line()
-        keyboard.add_button('5', VkKeyboardColor.PRIMARY, payload=23)
-        keyboard.add_button('6', VkKeyboardColor.PRIMARY, payload=24)
-        keyboard.add_button('7', VkKeyboardColor.PRIMARY, payload=25)
-        keyboard.add_button('8', VkKeyboardColor.PRIMARY, payload=26)
+        keyboard.add_button('Выбрать рейтинг', VkKeyboardColor.PRIMARY, payload=20)
         keyboard.add_line()
-        keyboard.add_button('9', VkKeyboardColor.PRIMARY, payload=27)
-        keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload=28)
-        keyboard.add_button('11', VkKeyboardColor.PRIMARY, payload=29)
-        keyboard.add_button('12', VkKeyboardColor.PRIMARY, payload=30)
+        keyboard.add_button('Выбрать жанр', VkKeyboardColor.PRIMARY, payload=21)
         keyboard.add_line()
+        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.PRIMARY, payload=0)
         return keyboard.get_keyboard()
 
-    if payload == 5 or payload == 6:
+    elif payload == 4:
+        pass
+
+    if payload == 5 or payload == 6 or payload == 21:
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload=7)
         keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload=8)
@@ -130,16 +191,19 @@ def start_menu():
         keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload=16)
         keyboard.add_button('11', VkKeyboardColor.PRIMARY, payload=17)
         keyboard.add_button('12', VkKeyboardColor.PRIMARY, payload=18)
-        keyboard.add_line()
         if payload == 5:
+            keyboard.add_line()
             keyboard.add_button('Переключить на сериалы', VkKeyboardColor.DEFAULT, payload=6)
             keyboard.add_line()
             keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
             return keyboard.get_keyboard()
         elif payload == 6:
+            keyboard.add_line()
             keyboard.add_button('Переключить на фильмы', VkKeyboardColor.DEFAULT, payload=5)
             keyboard.add_line()
             keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+            return keyboard.get_keyboard()
+        else:
             return keyboard.get_keyboard()
 
 
@@ -154,6 +218,10 @@ vk = vk_session.get_api()
 # Первый запрос к LongPoll: получаем server и key
 longpoll = VkBotLongPoll(vk_session, 197300375)
 film_or_serial = 0
+films_list = []
+temp = 0
+min_rating = 6
+max_rating = 10
 for event in longpoll.listen():
     if event.type == VkBotEventType.MESSAGE_NEW:
         peer_id_in = event.obj['message']['peer_id']
@@ -182,33 +250,16 @@ for event in longpoll.listen():
         elif payload == 2:
             send_message(peer_id=peer_id_in, message='Для рандомного выбора нужно выбрать категорию:', keyboard=keyboard)
         elif payload == 3:
-            send_message(peer_id=peer_id_in, message='Продвинутый поиск: ',
+            send_message(peer_id=peer_id_in, message='В меню продвинутого поиска: ',
                          keyboard=keyboard)
-        elif payload == 4:
-            send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
-                                                     f'{category_list}',
-                         keyboard=keyboard)
-        if payload in [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]:
-            genre_id = payload - 18
-            db = get_connection()
-            cursor = db.cursor()
-            selector_for_genre = ('SELECT * FROM genre_movie WHERE genre_id = %s')
-            cursor.execute(selector_for_genre, (genre_id,))
-            films_for_categories = [x[1] for x in cursor.fetchall()]
-            best_films = films_for_categories[:101]
-            for film_gen in best_films:
-                selector = ('SELECT * FROM movie WHERE premier > 2001 and rating > 6 and type_id = 0 and duration > 0 and votes > 25000 and id = %s')
-                film = random_film[0]
-                cursor.execute(selector, (film,))
-                checker = cursor.fetchall()
-
 
         elif payload == 5 or payload == 6:
+            temp = 'basic'
             send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
                                                      f'{category_list}',
                          keyboard=keyboard)
             film_or_serial = payload
-        if payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]:
+        if payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp != 'for_21':
             genre_id = payload - 6
             if film_or_serial == 5:
                 db = get_connection()
@@ -261,6 +312,64 @@ for event in longpoll.listen():
                 send_message(peer_id=peer_id_in, message='Окей, вот твой сериал:\n'
                                                          f'{our_film}',
                              keyboard=keyboard)
+
+        keyboard2 = key_advanced()
+        if payload == 19:
+            send_message(peer_id=peer_id_in, message='Автоматически минимальный год выставлен на 2000, а '
+                                                     'максимальный - на 2020. Получается такой формат: '
+                                                     '2010 - 2020. Если будем изменять - нажмите на соответствующую'
+                                                     'кнопку. Если нет, то нажмите "ничего не менять". ',
+                         keyboard=keyboard2)
+
+        elif payload == 20:
+            send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6, а '
+                                                     'максимальный - на 10. Получается такой формат: '
+                                                     '6 - 10. Если будем изменять - нажмите на соответствующую'
+                                                     'кнопку. Если нет, то нажмите "ничего не менять" ',
+                         keyboard=keyboard2)
+
+        elif payload == 21:
+            temp = 'for_21'
+            send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
+                                                     f'{category_list}',
+                         keyboard=keyboard)
+        elif payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'for_21':
+            genre_id = payload - 6
+            send_message(peer_id=peer_id_in,
+                         message=f'Жанр был успешно выбран - {list_of_genres[genre_id]["Genre name"]}',
+                         keyboard=keyboard2)
+
+        elif payload == 25 or payload == 26:
+            if payload == 25:
+                temp = 'min'
+                send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6, но это можно '
+                                                         'изменить здесь',
+                             keyboard=keyboard2)
+            elif payload == 26:
+                temp = 'max'
+                send_message(peer_id=peer_id_in, message='Автоматически максимальный рейтинг выставлен на 10, но это можно '
+                                                         'изменить здесь',
+                             keyboard=keyboard2)
+
+        if payload in [39, 40, 41, 42, 43, 44, 45, 46, 47, 48]:
+            if temp == 'min':
+                min_rating = payload - 38
+                send_message(peer_id=peer_id_in,
+                             message='минимальный рейтинг успешно изменен',
+                             keyboard=keyboard2)
+            elif temp == 'max':
+                max_rating = payload - 38
+                send_message(peer_id=peer_id_in,
+                             message='максимальный рейтинг успешно изменен',
+                             keyboard=keyboard2)
+        print(f'минимальный рейтинг - {min_rating}')
+        print(f'Максммальный рейтинг - {max_rating}')
+        print(f'Payload - {payload}')
+        try:
+            print(f'Это жанр - {genre_id}')
+        except:
+            pass
+        print()
 
         vk.messages.markAsRead(peer_id=peer_id_in)
 
