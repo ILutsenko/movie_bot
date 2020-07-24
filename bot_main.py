@@ -70,25 +70,32 @@ def send_message(peer_id, message=None, attachment=None, keyboard=None, payload=
 
 def key_advanced():
     if payload == 19:
+        """Продвинутый поиск - изменение года """
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('Начальный год', VkKeyboardColor.PRIMARY, payload=23)
         keyboard.add_button('Конечный год', VkKeyboardColor.PRIMARY, payload=24)
         keyboard.add_line()
-        keyboard.add_button('Ничего не менять', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_button('В меню поиска', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
-        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
+
     elif payload == 20:
+        """Продвинутый поиск - изменение рейтинга """
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('Мин. рейтинг', VkKeyboardColor.PRIMARY, payload=25)
         keyboard.add_button('Макс. рейтинг', VkKeyboardColor.PRIMARY, payload=26)
         keyboard.add_line()
-        keyboard.add_button('Ничего не менять', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_button('В меню поиска', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
-        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
     elif payload == 21:
+        """Продвинутый поиск - изменение жанра """
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload=27)
         keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload=28)
@@ -107,10 +114,12 @@ def key_advanced():
         keyboard.add_line()
         keyboard.add_button('Вернуться к поиску', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
-        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
-    if payload == 25 or payload == 26:
+    if payload == 25 or payload == 26 or payload in [39, 40, 41, 42, 43, 44, 45, 46, 47, 48]:
+        """Продвинутый поиск - меню для изменение рейтинга """
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload=39)
         keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload=40)
@@ -125,21 +134,16 @@ def key_advanced():
         keyboard.add_button('9', VkKeyboardColor.PRIMARY, payload=47)
         keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload=48)
         keyboard.add_line()
-        keyboard.add_button('Ничего не менять', VkKeyboardColor.DEFAULT, payload=3)
+        keyboard.add_button('Назад в меню поиска', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
-        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
-        return keyboard.get_keyboard()
-
-    if payload in [39, 40, 41, 42, 43, 44, 45, 46, 47, 48]:
-        keyboard = VkKeyboard(one_time=False)
-        keyboard.add_button('Вернуться к  поиску', VkKeyboardColor.PRIMARY, payload=20)
-        keyboard.add_line()
-        keyboard.add_button('Вернуться в начало', VkKeyboardColor.PRIMARY, payload=20)
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
 
 def start_menu():
-    if payload == None or payload == 0:
+    """Главное меню - начало диалога или любое сообщение """
+
+    if payload is None or payload == 0:
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('Я уже знаю что посмотреть', payload=1, color=VkKeyboardColor.PRIMARY)
         keyboard.add_line()
@@ -151,17 +155,22 @@ def start_menu():
         return keyboard.get_keyboard()
 
     if payload == 1:
+        """Главное меню - я знаю что буду искать """
         pass
 
     elif payload == 2:
+        """Главное меню - рандомный поиск """
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('Фильм', VkKeyboardColor.PRIMARY, payload=5)
         keyboard.add_button('Сериал', VkKeyboardColor.PRIMARY, payload=6)
         keyboard.add_line()
-        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.PRIMARY, payload=0)
+        keyboard.add_button('Главное меню', VkKeyboardColor.PRIMARY, payload=0)
         return keyboard.get_keyboard()
 
     elif payload == 3:
+        """Главное меню - продвинутый поиск"""
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('Выбрать год', VkKeyboardColor.PRIMARY, payload=19)
         keyboard.add_line()
@@ -169,13 +178,19 @@ def start_menu():
         keyboard.add_line()
         keyboard.add_button('Выбрать жанр', VkKeyboardColor.PRIMARY, payload=21)
         keyboard.add_line()
-        keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.PRIMARY, payload=0)
+        keyboard.add_button('Выбранные настройки', VkKeyboardColor.PRIMARY, payload=55)
+        keyboard.add_line()
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
     elif payload == 4:
+        """Главное меню - топ 100 по жанрам"""
+
         pass
 
     if payload == 5 or payload == 6 or payload == 21:
+        """Цифры для выбора категории"""
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload=7)
         keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload=8)
@@ -195,15 +210,19 @@ def start_menu():
             keyboard.add_line()
             keyboard.add_button('Переключить на сериалы', VkKeyboardColor.DEFAULT, payload=6)
             keyboard.add_line()
-            keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+            keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
             return keyboard.get_keyboard()
         elif payload == 6:
             keyboard.add_line()
             keyboard.add_button('Переключить на фильмы', VkKeyboardColor.DEFAULT, payload=5)
             keyboard.add_line()
-            keyboard.add_button('Я хочу начать сначала', VkKeyboardColor.DEFAULT, payload=0)
+            keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
             return keyboard.get_keyboard()
         else:
+            keyboard.add_line()
+            keyboard.add_button('Назад в меню поиска', VkKeyboardColor.PRIMARY, payload=3)
+            keyboard.add_line()
+            keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
             return keyboard.get_keyboard()
 
 
@@ -217,11 +236,17 @@ vk = vk_session.get_api()
 
 # Первый запрос к LongPoll: получаем server и key
 longpoll = VkBotLongPoll(vk_session, 197300375)
+
+# Переменные
 film_or_serial = 0
 films_list = []
 temp = 0
 min_rating = 6
 max_rating = 10
+min_year = 2000
+max_year = 2020
+genre_id = 'Не выбран'
+
 for event in longpoll.listen():
     if event.type == VkBotEventType.MESSAGE_NEW:
         peer_id_in = event.obj['message']['peer_id']
@@ -245,22 +270,32 @@ for event in longpoll.listen():
             payload = None
 
         keyboard = start_menu()
+        # Начало диалога или любое сообщение
         if payload == None:
             send_message(peer_id=peer_id_in, message='Мы в главном меню', keyboard=keyboard)
+
+        # Рандомный поиск
         elif payload == 2:
-            send_message(peer_id=peer_id_in, message='Для рандомного выбора нужно выбрать категорию:', keyboard=keyboard)
+            send_message(peer_id=peer_id_in, message='Для рандомного выбора нужно выбрать категорию:',
+                         keyboard=keyboard)
+        # Продвинутый поиск
         elif payload == 3:
             send_message(peer_id=peer_id_in, message='В меню продвинутого поиска: ',
                          keyboard=keyboard)
 
+        # Выбор жанра
         elif payload == 5 or payload == 6:
             temp = 'basic'
             send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
                                                      f'{category_list}',
                          keyboard=keyboard)
             film_or_serial = payload
+
+        # Если ответ на выбор жанра правильный и есть в списке
         if payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp != 'for_21':
             genre_id = payload - 6
+
+            # Подбор рандомного фильма
             if film_or_serial == 5:
                 db = get_connection()
                 cursor = db.cursor()
@@ -287,6 +322,8 @@ for event in longpoll.listen():
                 send_message(peer_id=peer_id_in, message='Окей, вот твой фильм:\n'
                                                          f'{our_film}',
                              keyboard=keyboard)
+
+            # Подбор рандомного сериала
             elif film_or_serial == 6:
                 db = get_connection()
                 cursor = db.cursor()
@@ -313,7 +350,10 @@ for event in longpoll.listen():
                                                          f'{our_film}',
                              keyboard=keyboard)
 
+        """Продвинутый поиск"""
         keyboard2 = key_advanced()
+
+        # Изменяем год
         if payload == 19:
             send_message(peer_id=peer_id_in, message='Автоматически минимальный год выставлен на 2000, а '
                                                      'максимальный - на 2020. Получается такой формат: '
@@ -321,6 +361,7 @@ for event in longpoll.listen():
                                                      'кнопку. Если нет, то нажмите "ничего не менять". ',
                          keyboard=keyboard2)
 
+        # Изменяем рейтинг
         elif payload == 20:
             send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6, а '
                                                      'максимальный - на 10. Получается такой формат: '
@@ -328,40 +369,55 @@ for event in longpoll.listen():
                                                      'кнопку. Если нет, то нажмите "ничего не менять" ',
                          keyboard=keyboard2)
 
+        # Изменяем выбираем жанр
         elif payload == 21:
             temp = 'for_21'
             send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
                                                      f'{category_list}',
                          keyboard=keyboard)
+
+        # Если ответ по жанру есть в списке - присваиваем жанр. Temp - различие для клавиатуры
         elif payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'for_21':
             genre_id = payload - 6
             send_message(peer_id=peer_id_in,
                          message=f'Жанр был успешно выбран - {list_of_genres[genre_id]["Genre name"]}',
                          keyboard=keyboard2)
 
+        # Клавиатура для изменения рейтинга
         elif payload == 25 or payload == 26:
             if payload == 25:
                 temp = 'min'
-                send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6, но это можно '
+                send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6,'
+                                                         ' но это можно '
                                                          'изменить здесь',
                              keyboard=keyboard2)
             elif payload == 26:
                 temp = 'max'
-                send_message(peer_id=peer_id_in, message='Автоматически максимальный рейтинг выставлен на 10, но это можно '
+                send_message(peer_id=peer_id_in, message='Автоматически максимальный рейтинг выставлен на 10,'
+                                                         ' но это можно '
                                                          'изменить здесь',
                              keyboard=keyboard2)
 
+        # Если число по рейтингу есть - присваиваем значения min_rating и max_rating
         if payload in [39, 40, 41, 42, 43, 44, 45, 46, 47, 48]:
             if temp == 'min':
                 min_rating = payload - 38
                 send_message(peer_id=peer_id_in,
-                             message='минимальный рейтинг успешно изменен',
+                             message=f'минимальный рейтинг успешно изменен на {min_rating}',
                              keyboard=keyboard2)
+
             elif temp == 'max':
                 max_rating = payload - 38
                 send_message(peer_id=peer_id_in,
-                             message='максимальный рейтинг успешно изменен',
+                             message=f'максимальный рейтинг успешно изменен на {max_rating}',
                              keyboard=keyboard2)
+        if payload == 55:
+            send_message(peer_id=peer_id_in,
+                         message=f'Рейтинг от {min_rating} до {max_rating}\n'
+                                 f'Год от {min_year} до {max_year}\n'
+                                 f'Жанр - {genre_id}\n',
+                         keyboard=keyboard2)
+
         print(f'минимальный рейтинг - {min_rating}')
         print(f'Максммальный рейтинг - {max_rating}')
         print(f'Payload - {payload}')
