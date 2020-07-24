@@ -107,7 +107,7 @@ def key_advanced():
         keyboard.add_line()
         keyboard.add_button('Следующая страница', VkKeyboardColor.DEFAULT, payload=99)
         keyboard.add_line()
-        keyboard.add_button('Меню поиска', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_button('Назад', VkKeyboardColor.PRIMARY, payload=19)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -132,10 +132,11 @@ def key_advanced():
         keyboard.add_button('2017', VkKeyboardColor.PRIMARY, payload=229)
         keyboard.add_button('2018', VkKeyboardColor.PRIMARY, payload=230)
         keyboard.add_button('2019', VkKeyboardColor.PRIMARY, payload=231)
+        keyboard.add_button('2020', VkKeyboardColor.PRIMARY, payload=232)
         keyboard.add_line()
         keyboard.add_button('Предыдущая страница', VkKeyboardColor.PRIMARY, payload=23)
         keyboard.add_line()
-        keyboard.add_button('Меню поиска', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_button('Назад', VkKeyboardColor.PRIMARY, payload=19)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -172,7 +173,7 @@ def key_advanced():
         keyboard.add_button('11', VkKeyboardColor.PRIMARY, payload=37)
         keyboard.add_button('12', VkKeyboardColor.PRIMARY, payload=38)
         keyboard.add_line()
-        keyboard.add_button('Вернуться к поиску', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_button('Назад', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -194,12 +195,12 @@ def key_advanced():
         keyboard.add_button('9', VkKeyboardColor.PRIMARY, payload=47)
         keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload=48)
         keyboard.add_line()
-        keyboard.add_button('Назад в меню поиска', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_button('Назад', VkKeyboardColor.PRIMARY, payload=20)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
-    if payload == 54:
+    if payload == 54 or payload in [70, 71, 72, 73]:
         """Продвинутый поиск - выбор сортировки"""
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('По году', payload=70, color=VkKeyboardColor.PRIMARY)
@@ -209,7 +210,7 @@ def key_advanced():
         keyboard.add_line()
         keyboard.add_button('По кол-ву голосов imdb', VkKeyboardColor.PRIMARY, payload=73)
         keyboard.add_line()
-        keyboard.add_button('Назад в меню поиска', VkKeyboardColor.DEFAULT, payload=3)
+        keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload=3)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -242,7 +243,7 @@ def start_menu():
         keyboard.add_line()
         keyboard.add_button('Продвинутый поиск', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
-        keyboard.add_button('Топ 100 фильмов\сериалов по жанрам', VkKeyboardColor.PRIMARY, payload=100)
+        keyboard.add_button('Топ 100 фильмов и сериалов по жанрам', VkKeyboardColor.PRIMARY, payload=100)
         return keyboard.get_keyboard()
 
     if payload == 1:
@@ -337,6 +338,7 @@ max_year = 2020
 genre_id = 'Не выбран'
 second_genre_id = 'Не выбран'
 pemp = 'none'
+kind_of_sorting = 'По кол-ву голосов imdb'
 
 for event in longpoll.listen():
     if event.type == VkBotEventType.MESSAGE_NEW:
@@ -476,6 +478,7 @@ for event in longpoll.listen():
                                                      ' кнопки с цифрами, если Вы решили изменить свое решение',
                          keyboard=keyboard2)
 
+        # Меню выбора года для поиска
         if payload == 23:
             keyboard_func = key_advanced()
             pemp = 'start'
@@ -487,9 +490,9 @@ for event in longpoll.listen():
             send_message(peer_id=peer_id_in, message='Окей, выбираем максимальный год: ',
                          keyboard=keyboard_func)
 
-
+        # Проверяем выбранный год
         if payload in [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219,
-                       220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231]:
+                       220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232]:
             if pemp == 'start':
                 min_year = payload + 1788
                 send_message(peer_id=peer_id_in, message=f'Минимальный год успешно выбран - {min_year}')
@@ -585,12 +588,14 @@ for event in longpoll.listen():
                              message=f'Рейтинг от {min_rating} до {max_rating}\n'
                                      f'Год от {min_year} до {max_year}\n'
                                      f'Жанр - {genre_id_for_answer}\n'
-                                     f'Второй жанр - {second_genre_id_for_answer}',
+                                     f'Второй жанр - {second_genre_id_for_answer}\n'
+                                     f'Вид сортировки - {kind_of_sorting}',
                              keyboard=keyboard2)
 
         if payload == 54:
             send_message(peer_id=peer_id_in,
                          message=f'В этом меню можно выбрать как будут отображаться фильмы или сериалы сверху - вниз\n'
+                                 f'По умолчанию сортировка задана по количеству голосов imdb\n'
                                  f'1) Сортировка по году - от выбранного Вами года, например от 2020,'
                                  f' до выбранного минимального года, например до 2015.\n\n'
                                  f'2) Сортировка по рейтингу выстроит фильмы или сериалы по рейтингу, от'
@@ -599,6 +604,23 @@ for event in longpoll.listen():
                                  f'3) Сортировка по году и рейтингу отсортирует для каждого года'
                                  f' по рейтингу, так же сверху вниз.\n\n'
                                  f'4) Сортировка по количеству голосов - соответственно сверху вниз',
+                         keyboard=keyboard2)
+
+        elif payload in [70, 71, 72, 73]:
+            if payload == 70:
+                kind_of_sorting = 'По году'
+            elif payload == 71:
+                kind_of_sorting = 'По рейтингу'
+            elif payload == 72:
+                kind_of_sorting = 'По году и рейтингу'
+            else:
+                kind_of_sorting = 'По количеству голосов imdb'
+            send_message(peer_id=peer_id_in, message='Тип сортировки изменен на: '
+                                                     f'{kind_of_sorting}\n'
+                                                     f'Изменить сортировку можно в этом же меню, для этого просто'
+                                                     f' нажмите на нужную сортировку\n'
+                                                     f'Для перехода обратно в меню фильтров нажмите "В меню поиска"'
+                                                     f'',
                          keyboard=keyboard2)
 
         if payload == 56:
@@ -615,15 +637,6 @@ for event in longpoll.listen():
                                  'При выборе жанра можно несколько раз нажимать на указанные'
                                  ' кнопки с цифрами, если Вы решили изменить свое решение',
                          keyboard=keyboard2)
-
-        print(f'минимальный рейтинг - {min_rating}')
-        print(f'Максммальный рейтинг - {max_rating}')
-        print(f'Payload - {payload}')
-        try:
-            print(f'Это жанр - {genre_id}')
-        except:
-            pass
-        print()
 
         vk.messages.markAsRead(peer_id=peer_id_in)
 
