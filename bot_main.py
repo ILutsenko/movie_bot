@@ -139,6 +139,20 @@ def key_advanced():
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
+    if payload == 54:
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('По году', payload=1, color=VkKeyboardColor.PRIMARY)
+        keyboard.add_button('По рейтингу', VkKeyboardColor.PRIMARY, payload=2)
+        keyboard.add_line()
+        keyboard.add_button('По году и рейтингу', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('По кол-ву голосов imdb', VkKeyboardColor.PRIMARY, payload=4)
+        keyboard.add_line()
+        keyboard.add_button('Назад в меню поиска', VkKeyboardColor.DEFAULT, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+
 
 def start_menu():
     """Главное меню - начало диалога или любое сообщение """
@@ -177,8 +191,11 @@ def start_menu():
         keyboard.add_button('Выбрать рейтинг', VkKeyboardColor.PRIMARY, payload=20)
         keyboard.add_line()
         keyboard.add_button('Выбрать жанр', VkKeyboardColor.PRIMARY, payload=21)
+        keyboard.add_button('Второй жанр', VkKeyboardColor.PRIMARY, payload=56)
         keyboard.add_line()
-        keyboard.add_button('Выбранные настройки', VkKeyboardColor.PRIMARY, payload=55)
+        keyboard.add_button('Выбрать сортировку', VkKeyboardColor.PRIMARY, payload=54)
+        keyboard.add_line()
+        keyboard.add_button('Выбранные настройки', VkKeyboardColor.DEFAULT, payload=55)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -188,7 +205,7 @@ def start_menu():
 
         pass
 
-    if payload == 5 or payload == 6 or payload == 21:
+    if payload == 5 or payload == 6 or payload == 21 or payload == 56:
         """Цифры для выбора категории"""
 
         keyboard = VkKeyboard(one_time=False)
@@ -246,6 +263,7 @@ max_rating = 10
 min_year = 2000
 max_year = 2020
 genre_id = 'Не выбран'
+second_genre_id = 'Не выбран'
 
 for event in longpoll.listen():
     if event.type == VkBotEventType.MESSAGE_NEW:
@@ -357,16 +375,24 @@ for event in longpoll.listen():
         if payload == 19:
             send_message(peer_id=peer_id_in, message='Автоматически минимальный год выставлен на 2000, а '
                                                      'максимальный - на 2020. Получается такой формат: '
-                                                     '2010 - 2020. Если будем изменять - нажмите на соответствующую'
-                                                     'кнопку. Если нет, то нажмите "ничего не менять". ',
+                                                     'от 2010 до 2020.\n'
+                                                     'Это можно '
+                                                     'изменить здесь, а можно оставить как есть и вернуться '
+                                                     'к остальным фильтрам. \n\n'
+                                                     'При выборе года можно несколько раз нажимать на указанные'
+                                                     ' кнопки с цифрами, если Вы решили изменить свое решение',
                          keyboard=keyboard2)
 
         # Изменяем рейтинг
         elif payload == 20:
             send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6, а '
                                                      'максимальный - на 10. Получается такой формат: '
-                                                     '6 - 10. Если будем изменять - нажмите на соответствующую'
-                                                     'кнопку. Если нет, то нажмите "ничего не менять" ',
+                                                     'от 6 до 10'
+                                                     'Это можно '
+                                                     'изменить здесь, а можно оставить как есть и вернуться '
+                                                     'к остальным фильтрам. \n\n'
+                                                     'При выборе рейтинга можно несколько раз нажимать на указанные'
+                                                     ' кнопки с цифрами, если Вы решили изменить свое решение',
                          keyboard=keyboard2)
 
         # Изменяем выбираем жанр
@@ -380,7 +406,9 @@ for event in longpoll.listen():
         elif payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'for_21':
             genre_id = payload - 6
             send_message(peer_id=peer_id_in,
-                         message=f'Жанр был успешно выбран - {list_of_genres[genre_id]["Genre name"]}',
+                         message=f'Жанр был успешно выбран - {list_of_genres[genre_id]["Genre name"]}.\n\n'
+                                 'При выборе жанра можно несколько раз нажимать на указанные'
+                                 ' кнопки с цифрами, если Вы решили изменить свое решение',
                          keyboard=keyboard2)
 
         # Клавиатура для изменения рейтинга
@@ -389,13 +417,19 @@ for event in longpoll.listen():
                 temp = 'min'
                 send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6,'
                                                          ' но это можно '
-                                                         'изменить здесь',
+                                                         'изменить здесь, а можно оставить как есть и вернуться '
+                                                         'к остальным фильтрам. \n\n'
+                                                         'При выборе рейтинга можно несколько раз нажимать на указанные'
+                                                         ' кнопки с цифрами, если Вы решили изменить свое решение',
                              keyboard=keyboard2)
             elif payload == 26:
                 temp = 'max'
-                send_message(peer_id=peer_id_in, message='Автоматически максимальный рейтинг выставлен на 10,'
+                send_message(peer_id=peer_id_in, message='Автоматически максимальный рейтинг выставлен на 10, '
                                                          ' но это можно '
-                                                         'изменить здесь',
+                                                         'изменить здесь, а можно оставить как есть и вернуться '
+                                                         'к остальным фильтрам. \n\n'
+                                                         'При выборе рейтинга можно несколько раз нажимать на указанные'
+                                                         ' кнопки с цифрами, если Вы решили изменить свое решение',
                              keyboard=keyboard2)
 
         # Если число по рейтингу есть - присваиваем значения min_rating и max_rating
@@ -403,19 +437,48 @@ for event in longpoll.listen():
             if temp == 'min':
                 min_rating = payload - 38
                 send_message(peer_id=peer_id_in,
-                             message=f'минимальный рейтинг успешно изменен на {min_rating}',
+                             message=f'Минимальный рейтинг успешно изменен на {min_rating}\n'
+                                     f'Можно вернуться в меню поиска чтобы настроить остальные фильтры',
                              keyboard=keyboard2)
 
             elif temp == 'max':
                 max_rating = payload - 38
                 send_message(peer_id=peer_id_in,
-                             message=f'максимальный рейтинг успешно изменен на {max_rating}',
+                             message=f'Максимальный рейтинг успешно изменен на {max_rating}\n'
+                                     f'Можно вернуться в меню поиска чтобы настроить остальные фильтры',
                              keyboard=keyboard2)
         if payload == 55:
             send_message(peer_id=peer_id_in,
                          message=f'Рейтинг от {min_rating} до {max_rating}\n'
                                  f'Год от {min_year} до {max_year}\n'
-                                 f'Жанр - {genre_id}\n',
+                                 f'Жанр - {list_of_genres[genre_id]["Genre name"]}\n'
+                                 f'Второй жанр - {list_of_genres[second_genre_id]["Genre name"]}',
+                         keyboard=keyboard2)
+
+        if payload == 54:
+            send_message(peer_id=peer_id_in,
+                         message=f'В этом меню можно выбрать как будут отображаться фильмы или сериалы сверху - вниз\n'
+                                 f'Сортировка по году - от выбранного Вами года, например 2020,'
+                                 f' до выбранного минимального года, например 2015.\n\n'
+                                 f'Сортировка по рейтингу выстроит фильмы или сериалы по рейтингу, от большего рейтинга'
+                                 f'к меньшиму.\n\n'
+                                 f'Сортировка по году отсортирует для каждого года по рейтингу, так же сверху вниз.\n\n'
+                                 f'Сортировка по количеству голосов - соответственно сверху вниз',
+                         keyboard=keyboard2)
+
+        if payload == 56:
+            temp = 'for_56'
+            send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
+                                                     f'{category_list}',
+                         keyboard=keyboard)
+
+        # Если ответ по жанру есть в списке - присваиваем жанр. Temp - различие для клавиатуры
+        elif payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'for_56':
+            second_genre_id = payload - 6
+            send_message(peer_id=peer_id_in,
+                         message=f'Второй жанр был успешно выбран - {list_of_genres[genre_id]["Genre name"]}.\n\n'
+                                 'При выборе жанра можно несколько раз нажимать на указанные'
+                                 ' кнопки с цифрами, если Вы решили изменить свое решение',
                          keyboard=keyboard2)
 
         print(f'минимальный рейтинг - {min_rating}')
