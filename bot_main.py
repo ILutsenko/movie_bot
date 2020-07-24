@@ -215,18 +215,18 @@ def key_advanced():
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
-    if payload == 100:
+    if payload == 100 or payload in [61, 62, 63, 64, 65]:
         """Топ 100 - меню выбора"""
         keyboard = VkKeyboard(one_time=False)
-        keyboard.add_button('Топ 100 по всем жанрам', VkKeyboardColor.PRIMARY, payload=61)
-        keyboard.add_line()
-        keyboard.add_button('Топ 100 по одному жанру', VkKeyboardColor.PRIMARY, payload=64)
-        keyboard.add_line()
-        keyboard.add_button('Топ 100 по рейтингу', VkKeyboardColor.PRIMARY, payload=62)
-        keyboard.add_line()
-        keyboard.add_button('Топ 100 по году и рейтингу', VkKeyboardColor.PRIMARY, payload=63)
+        keyboard.add_button('Топ 100 фильмов', VkKeyboardColor.PRIMARY, payload=61)
         keyboard.add_line()
         keyboard.add_button('Топ 100 сериалов', VkKeyboardColor.PRIMARY, payload=65)
+        keyboard.add_line()
+        keyboard.add_button('Топ 100 фильмов по одному жанру', VkKeyboardColor.PRIMARY, payload=64)
+        keyboard.add_line()
+        keyboard.add_button('Топ 100 сериалов по одному жанру', VkKeyboardColor.PRIMARY, payload=62)
+        #keyboard.add_line()
+        #keyboard.add_button('Топ 100 по году и рейтингу', VkKeyboardColor.PRIMARY, payload=63)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -236,14 +236,14 @@ def start_menu():
     """Главное меню - начало диалога или любое сообщение """
 
     if payload is None or payload == 0:
-        keyboard = VkKeyboard(one_time=True)
-        keyboard.add_button('Я уже знаю что посмотреть', payload=1, color=VkKeyboardColor.PRIMARY)
-        keyboard.add_line()
+        keyboard = VkKeyboard(one_time=False)
+        # keyboard.add_button('Я уже знаю что посмотреть', payload=1, color=VkKeyboardColor.PRIMARY)
+        # keyboard.add_line()
         keyboard.add_button('Я хочу выбрать рандомно', VkKeyboardColor.PRIMARY, payload=2)
         keyboard.add_line()
         keyboard.add_button('Продвинутый поиск', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
-        keyboard.add_button('Топ 100 фильмов и сериалов по жанрам', VkKeyboardColor.PRIMARY, payload=100)
+        keyboard.add_button('Топ 100 фильмов или сериалов', VkKeyboardColor.PRIMARY, payload=100)
         return keyboard.get_keyboard()
 
     if payload == 1:
@@ -376,25 +376,11 @@ for event in longpoll.listen():
             send_message(peer_id=peer_id_in, message='В меню продвинутого поиска: ',
                          keyboard=keyboard)
 
-        elif payload == 100:
-            temp = 'top100'
-            send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
-                                                     f'{category_list}',
-                         keyboard=keyboard)
-
         if payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'top100':
             key_advanced = key_advanced()
             genre_id_for_top_100 = payload - 6
             send_message(peer_id=peer_id_in, message='Жанр для топ 100 успешно выбран:\n', keyboard=key_advanced)
 
-        # Отображение топ 100 фильмов
-        if payload == 61 or payload == 62 or payload == 63:
-            if payload == 61:
-                pass
-            elif payload == 62:
-                pass
-            else:
-                pass
 
         # Выбор жанра
         elif payload == 5 or payload == 6:
@@ -637,6 +623,63 @@ for event in longpoll.listen():
                                  'При выборе жанра можно несколько раз нажимать на указанные'
                                  ' кнопки с цифрами, если Вы решили изменить свое решение',
                          keyboard=keyboard2)
+
+        if payload == 100:
+            keyboard_100 = key_advanced()
+            send_message(peer_id=peer_id_in, message='Меню топов',
+                         keyboard=keyboard_100)
+
+        elif payload in [61, 62, 63, 64, 65]:
+            keyboard_100 = key_advanced()
+            if payload == 61:
+                film_counter = 1
+                selector_for_100_films = 'SELECT * FROM top_250_movie'
+                db_100 = get_connection()
+                cursor_100 = db_100.cursor()
+                cursor_100.execute(selector_for_100_films)
+                answer = ''
+                count = 0
+                for film in cursor_100.fetchall():
+                    answer += f"{film_counter}-----{film[1]}-----\n"
+                    answer += f'Жанры: {film[2]}\n'
+                    answer += f'Рейтинг: {film[3]}\n'
+                    answer += f'Год: {film[4]}\n'
+                    answer += f'Количество голосов: {film[-1]}\n\n'
+                    count += 1
+                    film_counter += 1
+                    if count == 20:
+                        count = 0
+                        send_message(peer_id=peer_id_in, message=f'{answer}',
+                                     keyboard=keyboard_100)
+                        answer = ''
+
+            elif payload == 65:
+                serial_counter = 1
+                selector_for_100_serials = 'SELECT * FROM top_250_serials'
+                db_1005 = get_connection()
+                cursor_1005 = db_1005.cursor()
+                cursor_1005.execute(selector_for_100_serials)
+                answer2 = ''
+                count1 = 0
+                for film in cursor_1005.fetchall():
+                    answer2 += f"{serial_counter}-----{film[1]}-----\n"
+                    answer2 += f'Жанры: {film[2]}\n'
+                    answer2 += f'Рейтинг: {film[3]}\n'
+                    answer2 += f'Год: {film[4]}\n'
+                    answer2 += f'Количество голосов: {film[-1]}\n\n'
+                    count1 += 1
+                    serial_counter += 1
+                    if count1 == 20:
+                        count1 = 0
+                        send_message(peer_id=peer_id_in, message=f'{answer2}',
+                                     keyboard=keyboard_100)
+                        answer2 = ''
+
+
+
+
+
+
 
         vk.messages.markAsRead(peer_id=peer_id_in)
 
