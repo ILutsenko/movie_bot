@@ -87,6 +87,7 @@ genre_id = 'Не выбран'
 second_genre_id = 'Не выбран'
 pemp = 'none'
 kind_of_sorting = 'По кол-ву голосов imdb'
+gen = 'Not now'
 user_settings = {}
 
 
@@ -150,7 +151,7 @@ def our_keyboard():
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
-    elif payload == 5 or payload == 6 or payload == 21 or payload == 56 or payload == 64 or payload == 300:
+    elif payload == 5 or payload == 6 or payload == 64 or payload == 300:
         """Цифры для выбора категории"""
 
         keyboard = VkKeyboard(one_time=False)
@@ -316,7 +317,35 @@ def our_keyboard():
         keyboard.add_button('11', VkKeyboardColor.PRIMARY, payload=37)
         keyboard.add_button('12', VkKeyboardColor.PRIMARY, payload=38)
         keyboard.add_line()
-        keyboard.add_button('В меню поиска', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_button('Выбрать второй жанр', VkKeyboardColor.DEFAULT, payload=56)
+        keyboard.add_line()
+        keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload=3)
+        keyboard.add_line()
+        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+
+    if payload == 56:
+        """Продвинутый поиск - изменение жанра """
+
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload=27)
+        keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload=28)
+        keyboard.add_button('3', VkKeyboardColor.PRIMARY, payload=29)
+        keyboard.add_button('4', VkKeyboardColor.PRIMARY, payload=30)
+        keyboard.add_line()
+        keyboard.add_button('5', VkKeyboardColor.PRIMARY, payload=31)
+        keyboard.add_button('6', VkKeyboardColor.PRIMARY, payload=32)
+        keyboard.add_button('7', VkKeyboardColor.PRIMARY, payload=33)
+        keyboard.add_button('8', VkKeyboardColor.PRIMARY, payload=34)
+        keyboard.add_line()
+        keyboard.add_button('9', VkKeyboardColor.PRIMARY, payload=35)
+        keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload=36)
+        keyboard.add_button('11', VkKeyboardColor.PRIMARY, payload=37)
+        keyboard.add_button('12', VkKeyboardColor.PRIMARY, payload=38)
+        keyboard.add_line()
+        keyboard.add_button('Выбрать первый жанр', VkKeyboardColor.DEFAULT, payload=21)
+        keyboard.add_line()
+        keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload=3)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -621,14 +650,15 @@ while True:
 
                 # Изменяем выбираем жанр
                 elif payload == 21:
+                    gen = 'first'
                     temp = 'for_21'
                     send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
                                                              f'{category_list}',
                                  keyboard=keyboard)
 
                 # Если ответ по жанру есть в списке - присваиваем жанр. Temp - различие для клавиатуры
-                elif payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'for_21':
-                    user_settings[user_id]["first_genre"] = list_of_genres[payload - 6]["Genre name"]
+                elif payload in [27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38] and gen == 'first':
+                    user_settings[user_id]["first_genre"] = list_of_genres[payload - 26]["Genre name"]
                     send_message(peer_id=peer_id_in,
                                  message=f'Жанр был успешно выбран - '
                                          f'{user_settings[user_id]["first_genre"]}.\n\n'
@@ -727,14 +757,15 @@ while True:
                                  keyboard=keyboard)
 
                 if payload == 56:
+                    gen = 'second'
                     temp = 'for_56'
                     send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
                                                              f'{category_list}',
                                  keyboard=keyboard)
 
                 # Если ответ по жанру есть в списке - присваиваем жанр. Temp - различие для клавиатуры
-                elif payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'for_56':
-                    user_settings[user_id]["second_genre"] = list_of_genres[payload - 6]["Genre name"]
+                elif payload in [27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38] and gen == 'second':
+                    user_settings[user_id]["second_genre"] = list_of_genres[payload - 26]["Genre name"]
                     send_message(peer_id=peer_id_in,
                                  message=f'Второй жанр был успешно выбран - '
                                          f'{user_settings[user_id]["second_genre"]}.\n\n'
@@ -759,10 +790,10 @@ while True:
                         count = 0
                         for film in cursor_100.fetchall():
                             answer += f"{film_counter}-----{film[1]}-----\n"
-                            answer += f'Жанры: {film[2]}\n'
-                            answer += f'Рейтинг: {film[3]}\n'
-                            answer += f'Год: {film[4]}\n'
-                            answer += f'Количество голосов: {film[-1]}\n\n'
+                            answer += f'✓Жанры: {film[2]}\n'
+                            answer += f'✓Рейтинг: {film[3]}\n'
+                            answer += f'✓Год: {film[4]}\n'
+                            answer += f'✓Количество голосов: {film[-1]}\n\n'
                             count += 1
                             film_counter += 1
                             if count == 25:
@@ -783,10 +814,10 @@ while True:
                         count1 = 0
                         for film in cursor_1005.fetchall():
                             answer2 += f"{serial_counter}-----{film[1]}-----\n"
-                            answer2 += f'Жанры: {film[2]}\n'
-                            answer2 += f'Рейтинг: {film[3]}\n'
-                            answer2 += f'Год: {film[4]}\n'
-                            answer2 += f'Количество голосов: {film[-1]}\n\n'
+                            answer2 += f'✓Жанры: {film[2]}\n'
+                            answer2 += f'✓Рейтинг: {film[3]}\n'
+                            answer2 += f'✓Год: {film[4]}\n'
+                            answer2 += f'✓Количество голосов: {film[-1]}\n\n'
                             count1 += 1
                             serial_counter += 1
                             if count1 == 25:
@@ -801,17 +832,16 @@ while True:
                 if payload == 55:
 
                     send_message(peer_id=peer_id_in,
-                                 message=f'Рейтинг от {user_settings[user_id]["min_rating"]} '
+                                 message=f'✓Рейтинг от {user_settings[user_id]["min_rating"]} '
                                          f'до {user_settings[user_id]["max_rating"]}\n'
-                                         f'Год от {user_settings[user_id]["start_year"]} '
+                                         f'✓Год от {user_settings[user_id]["start_year"]} '
                                          f'до {user_settings[user_id]["end_year"]}\n'
-                                         f'Жанр - {user_settings[user_id]["first_genre"]}\n'
-                                         f'Второй жанр - {user_settings[user_id]["second_genre"]}\n'
-                                         f'Вид сортировки - {user_settings[user_id]["sorting"]}',
+                                         f'✓Жанр - {user_settings[user_id]["first_genre"]}\n'
+                                         f'✓Второй жанр - {user_settings[user_id]["second_genre"]}\n'
+                                         f'✓Вид сортировки - {user_settings[user_id]["sorting"]}',
                                  keyboard=keyboard)
 
                 vk.messages.markAsRead(peer_id=peer_id_in)
-                print(user_settings)
 
     except Exception as error:
         print(error)
