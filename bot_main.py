@@ -88,6 +88,7 @@ second_genre_id = 'Не выбран'
 pemp = 'none'
 kind_of_sorting = 'По кол-ву голосов imdb'
 gen = 'Not now'
+kind = 'None'
 user_settings = {}
 
 
@@ -129,12 +130,16 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('Выбрать сортировку', VkKeyboardColor.PRIMARY, payload=54)
         keyboard.add_line()
+        keyboard.add_button('Кол-во отображаемых', VkKeyboardColor.PRIMARY, payload=54)
+        keyboard.add_line()
+        keyboard.add_button('Показать подходящие', VkKeyboardColor.PRIMARY, payload=544)
+        keyboard.add_line()
         keyboard.add_button('Выбранные настройки', VkKeyboardColor.DEFAULT, payload=55)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
-    elif payload == 100 or payload in [61, 62, 63, 64, 65]:
+    elif payload == 100 or payload in [61, 62, 63, 64, 65] and kind != 'serial' and kind != 'film' and kind != 'None':
         """Главное меню - топ 100 - меню выбора"""
 
         keyboard = VkKeyboard(one_time=False)
@@ -149,6 +154,30 @@ def our_keyboard():
         #keyboard.add_button('Топ 100 по году и рейтингу', VkKeyboardColor.PRIMARY, payload=63)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
+        return keyboard.get_keyboard()
+
+    elif payload == 62 or payload == 64 or kind == 'serial' or kind == 'film':
+        """Выбор жанра для топ 100"""
+
+        keyboard = VkKeyboard(one_time=False)
+        keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload=301)
+        keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload=302)
+        keyboard.add_button('3', VkKeyboardColor.PRIMARY, payload=303)
+        keyboard.add_button('4', VkKeyboardColor.PRIMARY, payload=304)
+        keyboard.add_line()
+        keyboard.add_button('5', VkKeyboardColor.PRIMARY, payload=305)
+        keyboard.add_button('6', VkKeyboardColor.PRIMARY, payload=306)
+        keyboard.add_button('7', VkKeyboardColor.PRIMARY, payload=307)
+        keyboard.add_button('8', VkKeyboardColor.PRIMARY, payload=308)
+        keyboard.add_line()
+        keyboard.add_button('9', VkKeyboardColor.PRIMARY, payload=309)
+        keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload=310)
+        keyboard.add_button('11', VkKeyboardColor.PRIMARY, payload=311)
+        keyboard.add_button('12', VkKeyboardColor.PRIMARY, payload=312)
+        keyboard.add_line()
+        keyboard.add_button('В меню топов', VkKeyboardColor.DEFAULT, payload=100)
+        keyboard.add_line()
+        keyboard.add_button('В главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
     elif payload == 5 or payload == 6 or payload == 64 or payload == 300:
@@ -781,52 +810,48 @@ while True:
                 # Выводим топ 100 фильмов и топ 100 сериалов по всем жанрам
                 elif payload in [61, 62, 63, 64, 65]:
                     if payload == 61:
-                        film_counter = 1
                         selector_for_100_films = 'SELECT * FROM top_250_movie'
                         db_100 = get_connection()
                         cursor_100 = db_100.cursor()
                         cursor_100.execute(selector_for_100_films)
+                        to_250 = cursor_100.fetchall()
+                        to_250 = to_250[:100]
+                        to_250.reverse()
                         answer = ''
-                        count = 0
-                        for film in cursor_100.fetchall():
-                            answer += f"{film_counter}-----{film[1]}-----\n"
+                        count = len(to_250)
+                        for film in to_250:
+                            answer += f"{count}-----{film[1]}-----\n"
                             answer += f'✓Жанры: {film[2]}\n'
                             answer += f'✓Рейтинг: {film[3]}\n'
                             answer += f'✓Год: {film[4]}\n'
                             answer += f'✓Количество голосов: {film[-1]}\n\n'
-                            count += 1
-                            film_counter += 1
-                            if count == 25:
-                                count = 0
+                            count -= 1
+                            if count % 25 == 0:
                                 send_message(peer_id=peer_id_in, message=f'{answer}',
                                              keyboard=keyboard)
                                 answer = ''
-                            if film_counter > 100:
-                                break
 
                     elif payload == 65:
-                        serial_counter = 1
                         selector_for_100_serials = 'SELECT * FROM top_250_serials'
                         db_1005 = get_connection()
                         cursor_1005 = db_1005.cursor()
                         cursor_1005.execute(selector_for_100_serials)
+                        top_films_250 = cursor_1005.fetchall()
+                        top_films_250 = top_films_250[:100]
+                        top_films_250.reverse()
                         answer2 = ''
-                        count1 = 0
-                        for film in cursor_1005.fetchall():
-                            answer2 += f"{serial_counter}-----{film[1]}-----\n"
+                        count1 = len(top_films_250)
+                        for film in top_films_250:
+                            answer2 += f"{count1}-----{film[1]}-----\n"
                             answer2 += f'✓Жанры: {film[2]}\n'
                             answer2 += f'✓Рейтинг: {film[3]}\n'
                             answer2 += f'✓Год: {film[4]}\n'
                             answer2 += f'✓Количество голосов: {film[-1]}\n\n'
-                            count1 += 1
-                            serial_counter += 1
-                            if count1 == 25:
-                                count1 = 0
+                            count1 -= 1
+                            if count1 % 25 == 0:
                                 send_message(peer_id=peer_id_in, message=f'{answer2}',
                                              keyboard=keyboard)
                                 answer2 = ''
-                            if serial_counter > 100:
-                                break
 
                 # Показать выбранную настройку
                 if payload == 55:
@@ -840,6 +865,78 @@ while True:
                                          f'✓Второй жанр - {user_settings[user_id]["second_genre"]}\n'
                                          f'✓Вид сортировки - {user_settings[user_id]["sorting"]}',
                                  keyboard=keyboard)
+
+                elif payload == 62 or payload == 64:
+                    if payload == 62:
+                        kind = 'serial'
+                        send_message(peer_id=peer_id_in, message=f'Выберите жанр для топ 100 сериалов',
+                                     keyboard=keyboard)
+                    elif payload == 64:
+                        kind = 'film'
+                        send_message(peer_id=peer_id_in, message=f'Выберите жанр для топ 100 фильмов',
+                                     keyboard=keyboard)
+                # Сериал
+
+                elif kind == 'serial' or kind == 'film' and payload in [301, 302, 303, 304, 305, 306, 307, 308, 309,
+                                                                        310, 311, 312]:
+                    genre_for_top_100 = payload - 300
+
+                    if kind == 'serial':
+                        serial_counter1 = 1
+                        db_top_ser = get_connection()
+                        cursor_top_ser = db_top_ser.cursor()
+                        selector = ('SELECT * FROM movie INNER JOIN genre_movie ON movie.id = genre_movie.movie_id '
+                                    'WHERE genre_id = %s and rating > 5 and premier > 1995 and duration != 0 and '
+                                    'votes > 20000 and type_id != 0')
+
+                        cursor_top_ser.execute(selector, (genre_for_top_100, ))
+                        mass_serial = cursor_top_ser.fetchall()
+                        mass_serial.sort(key=lambda x: (x[7], x[5], x[3]), reverse=True)
+                        mass_serial = mass_serial[:100]
+                        mass_serial.reverse()
+                        top_serials = ''
+                        ser_counter = len(mass_serial)
+                        for film in mass_serial:
+                            top_serials += f"{ser_counter}-----{film[1]}-----\n"
+                            top_serials += f'✓Рейтинг: {film[5]}\n'
+                            top_serials += f'✓Год: {film[3]}\n'
+                            top_serials += f'✓Количество голосов: {film[7]}\n\n'
+                            ser_counter -= 1
+                            serial_counter1 += 1
+                            if ser_counter % 25 == 0:
+                                print(top_serials)
+                                send_message(peer_id=peer_id_in, message=f'{top_serials}',
+                                             keyboard=keyboard)
+                                top_serials = ''
+
+                    elif kind == 'film':
+                        fil_counter1 = 1
+                        db_top_film = get_connection()
+                        cursor_top_film = db_top_film.cursor()
+                        selector = ('SELECT * FROM movie INNER JOIN genre_movie ON movie.id = genre_movie.movie_id '
+                                    'WHERE genre_id = %s and rating > 5 and premier > 1995 and duration != 0 and '
+                                    'votes > 20000 and type_id = 0')
+
+                        cursor_top_film.execute(selector, (genre_for_top_100,))
+                        mass_films = cursor_top_film.fetchall()
+                        mass_films.sort(key=lambda x: (x[7], x[5], x[3]), reverse=True)
+                        mass_films = mass_films[:100]
+                        mass_films.reverse()
+
+                        top_films = ''
+                        fil_counter = 100
+                        for film in mass_films:
+                            top_films += f"{fil_counter}-----{film[1]}-----\n"
+                            top_films += f'✓Рейтинг: {film[5]}\n'
+                            top_films += f'✓Год: {film[3]}\n'
+                            top_films += f'✓Количество голосов: {film[7]}\n\n'
+                            fil_counter -= 1
+                            fil_counter1 += 1
+                            if fil_counter % 25 == 0:
+                                send_message(peer_id=peer_id_in, message=f'{top_films}',
+                                             keyboard=keyboard)
+                                top_films = ''
+
 
                 vk.messages.markAsRead(peer_id=peer_id_in)
 
