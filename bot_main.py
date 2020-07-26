@@ -236,9 +236,16 @@ def our_keyboard():
         keyboard.add_button('2003', VkKeyboardColor.PRIMARY, payload=215)
         keyboard.add_button('2004', VkKeyboardColor.PRIMARY, payload=216)
         keyboard.add_line()
-        keyboard.add_button('Следующая страница', VkKeyboardColor.DEFAULT, payload=99)
-        keyboard.add_line()
-        keyboard.add_button('Назад', VkKeyboardColor.PRIMARY, payload=19)
+        keyboard.add_button('Следующая страница', VkKeyboardColor.PRIMARY, payload=99)
+        if payload == 23:
+            keyboard.add_line()
+            keyboard.add_button('Переключить на конечный год', VkKeyboardColor.DEFAULT, payload=24)
+            keyboard.add_line()
+        elif payload == 24:
+            keyboard.add_line()
+            keyboard.add_button('Переключить на начальный год', VkKeyboardColor.DEFAULT, payload=23)
+            keyboard.add_line()
+        keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload=3)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -266,8 +273,15 @@ def our_keyboard():
         keyboard.add_button('2020', VkKeyboardColor.PRIMARY, payload=232)
         keyboard.add_line()
         keyboard.add_button('Предыдущая страница', VkKeyboardColor.PRIMARY, payload=23)
-        keyboard.add_line()
-        keyboard.add_button('Назад', VkKeyboardColor.PRIMARY, payload=19)
+        if payload == 23:
+            keyboard.add_line()
+            keyboard.add_button('Переключить на конечный год', VkKeyboardColor.DEFAULT, payload=24)
+            keyboard.add_line()
+        elif payload == 24:
+            keyboard.add_line()
+            keyboard.add_button('Переключить на начальный год', VkKeyboardColor.DEFAULT, payload=23)
+            keyboard.add_line()
+        keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload=3)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -303,7 +317,7 @@ def our_keyboard():
         keyboard.add_button('11', VkKeyboardColor.PRIMARY, payload=37)
         keyboard.add_button('12', VkKeyboardColor.PRIMARY, payload=38)
         keyboard.add_line()
-        keyboard.add_button('Назад', VkKeyboardColor.PRIMARY, payload=3)
+        keyboard.add_button('В меню поиска', VkKeyboardColor.PRIMARY, payload=3)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -325,7 +339,7 @@ def our_keyboard():
         keyboard.add_button('9', VkKeyboardColor.PRIMARY, payload=47)
         keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload=48)
         keyboard.add_line()
-        keyboard.add_button('Назад', VkKeyboardColor.PRIMARY, payload=20)
+        keyboard.add_button('В меню поиска', VkKeyboardColor.PRIMARY, payload=20)
         keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
@@ -514,7 +528,7 @@ while True:
                                 break
                             else:
                                 random_film = random.choices(films_for_categories)
-                        send_message(peer_id=peer_id_in, message='Окей, вот твой сериал:\n'
+                        send_message(peer_id=peer_id_in, message='А вот и твой сериал:\n'
                                                                  f'{our_film}',
                                      keyboard=keyboard)
 
@@ -529,25 +543,18 @@ while True:
 
                 # Изменяем год - исправить
                 elif payload == 19:
-                    send_message(peer_id=peer_id_in, message='Автоматически минимальный год выставлен на 2000, а '
-                                                             'максимальный - на 2020. Получается такой формат: '
-                                                             'от 2010 до 2020.\n'
-                                                             'Это можно '
-                                                             'изменить здесь, а можно оставить как есть и вернуться '
-                                                             'к остальным фильтрам. \n\n'
-                                                             'При выборе года можно несколько раз нажимать на указанные'
-                                                             ' кнопки с цифрами, если Вы решили изменить свое решение',
+                    send_message(peer_id=peer_id_in, message='',
                                  keyboard=keyboard)
 
                 # Меню выбора года для поиска
                 elif payload == 23:
                     pemp = 'start'
-                    send_message(peer_id=peer_id_in, message='Окей, выбираем минимальный год: ',
+                    send_message(peer_id=peer_id_in, message='Выбираем минимальный год: ',
                                  keyboard=keyboard)
 
                 elif payload == 24:
                     pemp = 'end'
-                    send_message(peer_id=peer_id_in, message='Окей, выбираем максимальный год: ',
+                    send_message(peer_id=peer_id_in, message='Выбираем максимальный год: ',
                                  keyboard=keyboard)
 
                 # Проверяем выбранный год
@@ -557,10 +564,9 @@ while True:
 
                     if pemp == 'start':
                         if payload + 1788 >= user_settings[user_id]["end_year"]:
-                            print(user_settings[user_id]["end_year"])
                             send_message(peer_id=peer_id_in, message=f'Минимальный год не может быть больше '
                                                                      f'или равным максимальному году, попробуйте '
-                                                                     f'ввести год корректно\n'
+                                                                     f'выбрать год еще раз\n'
                                                                      f'Год, который выбран как максимальный '
                                                                      f'-{user_settings[user_id]["end_year"]}',
                                          keyboard=keyboard)
@@ -568,21 +574,32 @@ while True:
                             user_settings[user_id]["start_year"] = payload + 1788
                             print(user_settings[user_id]["start_year"])
                             send_message(peer_id=peer_id_in, message=f'Минимальный год успешно выбран -'
-                                                                     f' {user_settings[user_id]["start_year"]}')
+                                                                     f' {user_settings[user_id]["start_year"]}\n\n'
+                                                                     f'Чтобы изменить его еще раз, просто нажмите '
+                                                                     f'на нужный год в этом же меню.\n '
+                                                                     f'Чтобы перейти к выбору "Конечного года" - '
+                                                                     f'нажмите на кнопку "Переключить на конечный '
+                                                                     f'год\n\n" Чтобы вернуться к остальным фильтрам '
+                                                                     f'- нажмите "В меню поиска"')
 
                     elif pemp == 'end':
-                        print(user_settings[user_id]["start_year"])
-                        print(payload + 1788)
                         if payload + 1788 <= user_settings[user_id]["start_year"]:
                             send_message(peer_id=peer_id_in, message=f'Максимальный год не может быть меньше '
-                                                                     f'или равным минимальному году, попробуйте '
+                                                                     f'или равным минимальному году. Попробуйте выбрать'
+                                                                     f'год еще раз\n'
                                                                      f'Год, который выбран как минимальный '
                                                                      f'-{user_settings[user_id]["start_year"]}',
                                          keyboard=keyboard)
                         else:
                             user_settings[user_id]["end_year"] = payload + 1788
                             send_message(peer_id=peer_id_in, message=f'Максимальный год успешно выбран - '
-                                                                     f'{user_settings[user_id]["end_year"]}')
+                                                                     f'{user_settings[user_id]["end_year"]}.\n\n'
+                                                                     f'Чтобы изменить его еще раз, просто нажмите '
+                                                                     f'на нужный год в этом же меню.\n '
+                                                                     f'Чтобы перейти к выбору "Начального года" - '
+                                                                     f'нажмите на кнопку "Переключить на начальный '
+                                                                     f'год\n\n" Чтобы вернуться к остальным фильтрам '
+                                                                     f'- нажмите "В меню поиска"')
 
                 elif payload == 99:
                     send_message(peer_id=peer_id_in, message='Открываем следующую страницу: ',
@@ -593,14 +610,7 @@ while True:
 
                 # Изменяем рейтинг
                 elif payload == 20:
-                    send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6, а '
-                                                             'максимальный - на 10. Получается такой формат: '
-                                                             'от 6 до 10'
-                                                             'Это можно '
-                                                             'изменить здесь, а можно оставить как есть и вернуться '
-                                                             'к остальным фильтрам. \n\n'
-                                                             'При выборе рейтинга можно несколько раз нажимать на указанные'
-                                                             ' кнопки с цифрами, если Вы решили изменить свое решение',
+                    send_message(peer_id=peer_id_in, message='',
                                  keyboard=keyboard)
 
                 # Изменяем выбираем жанр
@@ -617,28 +627,20 @@ while True:
                                  message=f'Жанр был успешно выбран - '
                                          f'{user_settings[user_id]["first_genre"]}.\n\n'
                                          'При выборе жанра можно несколько раз нажимать на указанные'
-                                         ' кнопки с цифрами, если Вы решили изменить свое решение',
+                                         ' кнопки с цифрами, если Вы решили изменить свое решение. Если же жанр выбран'
+                                         ' правильно - можно вернуться к настройкам остальных фильтров нажам на '
+                                         '"В меню поиска"',
                                  keyboard=keyboard)
 
                 # Клавиатура для изменения рейтинга
                 elif payload == 25 or payload == 26:
                     if payload == 25:
                         temp = 'min'
-                        send_message(peer_id=peer_id_in, message='Автоматически минимальный рейтинг выставлен на 6,'
-                                                                 ' но это можно '
-                                                                 'изменить здесь, а можно оставить как есть и вернуться '
-                                                                 'к остальным фильтрам. \n\n'
-                                                                 'При выборе рейтинга можно несколько раз нажимать на указанные'
-                                                                 ' кнопки с цифрами, если Вы решили изменить свое решение',
+                        send_message(peer_id=peer_id_in, message=' ',
                                      keyboard=keyboard)
                     elif payload == 26:
                         temp = 'max'
-                        send_message(peer_id=peer_id_in, message='Автоматически максимальный рейтинг выставлен на 10, '
-                                                                 ' но это можно '
-                                                                 'изменить здесь, а можно оставить как есть и вернуться '
-                                                                 'к остальным фильтрам. \n\n'
-                                                                 'При выборе рейтинга можно несколько раз нажимать на указанные'
-                                                                 ' кнопки с цифрами, если Вы решили изменить свое решение',
+                        send_message(peer_id=peer_id_in, message=' ',
                                      keyboard=keyboard)
 
                 # Если число по рейтингу есть - присваиваем значения min_rating и max_rating
@@ -655,7 +657,7 @@ while True:
                             send_message(peer_id=peer_id_in,
                                          message=f'Минимальный рейтинг успешно изменен на '
                                                  f'{user_settings[user_id]["min_rating"]}\n'
-                                                 f'Можно вернуться в меню поиска чтобы настроить '
+                                                 f'Можно вернуться в "меню поиска" чтобы настроить '
                                                  f'остальные фильтры или выбрать '
                                                  f'рейтинг еще раз из этого меню, просто нажав на цифру',
                                          keyboard=keyboard)
@@ -672,7 +674,7 @@ while True:
                             send_message(peer_id=peer_id_in,
                                          message=f'Максимальный рейтинг успешно изменен на '
                                                  f'{user_settings[user_id]["max_rating"]}\n'
-                                                 f'Можно вернуться в меню поиска чтобы настроить '
+                                                 f'Можно вернуться в "меню поиска" чтобы настроить '
                                                  f'остальные фильтры или выбрать '
                                                  f'рейтинг еще раз из этого меню, просто нажав на цифру',
                                          keyboard=keyboard)
@@ -681,16 +683,20 @@ while True:
                 # Выбор сортировки
                 if payload == 54:
                     send_message(peer_id=peer_id_in,
-                                 message=f'В этом меню можно выбрать как будут отображаться фильмы или сериалы сверху - вниз\n'
-                                         f'По умолчанию сортировка задана по количеству голосов imdb\n'
-                                         f'1) Сортировка по году - от выбранного Вами года, например от 2020,'
-                                         f' до выбранного минимального года, например до 2015.\n\n'
-                                         f'2) Сортировка по рейтингу выстроит фильмы или сериалы по рейтингу, от'
-                                         f' большего рейтинга'
-                                         f'к меньшиму.\n\n'
-                                         f'3) Сортировка по году и рейтингу отсортирует для каждого года'
-                                         f' по рейтингу, так же сверху вниз.\n\n'
-                                         f'4) Сортировка по количеству голосов - соответственно сверху вниз',
+                                 message=f'В этом меню можно выбрать как будут отображаться фильмы и сериалы.\n\n'
+                                         f'✅ 1) Сортировка по году - покажет список, который начинается с выбранного'
+                                         f' Вами "Максимального году" и заканчивается выбранным Вами '
+                                         f'"Минимальным годом". Все фильмы и сериалы будут отображены в '
+                                         f'удобном для чтения порядке\n\n'
+                                         f'✅ 2) Сортировка по рейтингу. Сортирует по рейтингу, выводит точно так же '
+                                         f'как и при сортировке "По году". Фильмы и сериалы отображаются '
+                                         f'так же в удобном порядке.\n\n'
+                                         f'✅ 3) Сортировка по году и по рейтингу. Сортирует фильмы и сериалы для '
+                                         f'каждого года по рейтингу. Например сначала выведутся все фильмы и сериалы '
+                                         f'для 2020 года, сортированные по рейтингу, затем для 2019 и так далее. '
+                                         f'Фильмы и сериалы отображаются так же в удобном порядке.\n\n'
+                                         f'✅ 4) Сортировка по количеству голосов IMDB - Сортирует фильмы по количеству '
+                                         f'оценок на сайте IMDB. Фильмы и сериалы отображаются так же в удобном порядке.',
                                  keyboard=keyboard)
 
 
@@ -706,9 +712,11 @@ while True:
                         user_settings[user_id]["sorting"] = 'По количеству голосов imdb'
                     send_message(peer_id=peer_id_in, message='Тип сортировки изменен на: '
                                                              f'{user_settings[user_id]["sorting"]}\n'
-                                                             f'Изменить сортировку можно в этом же меню, для этого просто'
+                                                             f'Изменить сортировку можно в этом же меню, для этого '
+                                                             f'просто'
                                                              f' нажмите на нужную сортировку\n'
-                                                             f'Для перехода обратно в меню фильтров нажмите "В меню поиска"'
+                                                             f'Для перехода обратно в меню фильтров нажмите '
+                                                             f'"В меню поиска"'
                                                              f'',
                                  keyboard=keyboard)
 
@@ -725,7 +733,8 @@ while True:
                                  message=f'Второй жанр был успешно выбран - '
                                          f'{user_settings[user_id]["second_genre"]}.\n\n'
                                          'При выборе жанра можно несколько раз нажимать на указанные'
-                                         ' кнопки с цифрами, если Вы решили изменить свое решение',
+                                         ' кнопки с цифрами, если Вы решили изменить свое решение. Если жанр выбран '
+                                         'правильно - нажмите "В меню поиска" для настройки остальных фильтров',
                                  keyboard=keyboard)
 
                 if payload == 100:
