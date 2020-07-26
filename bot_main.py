@@ -111,6 +111,8 @@ def our_keyboard():
         keyboard.add_button('Фильм', VkKeyboardColor.PRIMARY, payload=5)
         keyboard.add_button('Сериал', VkKeyboardColor.PRIMARY, payload=6)
         keyboard.add_line()
+        keyboard.add_button('Завершенный сериал', VkKeyboardColor.PRIMARY, payload=300)
+        keyboard.add_line()
         keyboard.add_button('Главное меню', VkKeyboardColor.PRIMARY, payload=0)
         return keyboard.get_keyboard()
 
@@ -149,7 +151,7 @@ def our_keyboard():
         keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
         return keyboard.get_keyboard()
 
-    elif payload == 5 or payload == 6 or payload == 21 or payload == 56 or payload == 64:
+    elif payload == 5 or payload == 6 or payload == 21 or payload == 56 or payload == 64 or payload == 300:
         """Цифры для выбора категории"""
 
         keyboard = VkKeyboard(one_time=False)
@@ -171,11 +173,23 @@ def our_keyboard():
             keyboard.add_line()
             keyboard.add_button('Переключить на сериалы', VkKeyboardColor.DEFAULT, payload=6)
             keyboard.add_line()
+            keyboard.add_button('Переключить на завершенные сериалы', VkKeyboardColor.DEFAULT, payload=300)
+            keyboard.add_line()
             keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
             return keyboard.get_keyboard()
         elif payload == 6:
             keyboard.add_line()
             keyboard.add_button('Переключить на фильмы', VkKeyboardColor.DEFAULT, payload=5)
+            keyboard.add_line()
+            keyboard.add_button('Переключить на завершенные сериалы', VkKeyboardColor.DEFAULT, payload=300)
+            keyboard.add_line()
+            keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
+            return keyboard.get_keyboard()
+        elif payload == 300:
+            keyboard.add_line()
+            keyboard.add_button('Переключить на фильмы', VkKeyboardColor.DEFAULT, payload=5)
+            keyboard.add_line()
+            keyboard.add_button('Переключить на сериалы', VkKeyboardColor.DEFAULT, payload=6)
             keyboard.add_line()
             keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload=0)
             return keyboard.get_keyboard()
@@ -406,7 +420,7 @@ while True:
                     send_message(peer_id=peer_id_in, message='Для рандомного выбора нужно выбрать категорию:',
                                  keyboard=keyboard)
                 # Выбор жанра
-                elif payload == 5 or payload == 6:
+                elif payload == 5 or payload == 6 or payload == 300:
                     temp = 'basic'
                     send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
                                                              f'{category_list}',
@@ -433,11 +447,12 @@ while True:
                             checker = cursor.fetchall()
                             if len(checker) > 0:
                                 prod_actor_genre = actors_producers_genres(film)
-                                our_film = f"Название фильма - {checker[0][1]}\nЖанры - {prod_actor_genre[2]}" \
-                                           f"\nГод премьеры - {checker[0][3]}\nРейтинг - " \
-                                           f"{checker[0][5]}\nПродюсер - {prod_actor_genre[0]}\nАктеры - {prod_actor_genre[1]}" \
-                                           f"\nПродолжительность - {checker[0][6]} мин\n" \
-                                           f" Количество голосов imdb - {checker[0][7]} голосов\nСсылка  - {checker[0][8]}"
+                                our_film = f"---Фильм---\n▶{checker[0][1]}\n\n✓Жанры - {prod_actor_genre[2]}" \
+                                           f"\n✓Год премьеры - {checker[0][3]}\n✓Рейтинг - " \
+                                           f"{checker[0][5]}\n✓Продолжительность - {checker[0][6]} мин\n" \
+                                           f"✓Количество голосов imdb - {checker[0][7]}\n\n" \
+                                           f"🎬Продюсер - {prod_actor_genre[0]}\n✪Актеры - {prod_actor_genre[1]}\n\n" \
+                                           f"Ссылка  - {checker[0][8]}"
                                 break
                             else:
                                 random_film = random.choices(films_for_categories)
@@ -462,11 +477,40 @@ while True:
                             checker = cursor.fetchall()
                             if len(checker) > 0:
                                 prod_actor_genre = actors_producers_genres(film)
-                                our_film = f"Название фильма - {checker[0][1]}\nЖанры - {prod_actor_genre[2]}" \
-                                           f"\nГод премьеры - {checker[0][3]}\nРейтинг - " \
-                                           f"{checker[0][5]}\nПродюсер - {prod_actor_genre[0]}\nАктеры - {prod_actor_genre[1]}" \
-                                           f"\nПродолжительность серии - {checker[0][6]} мин\n" \
-                                           f" Количество голосов imdb - {checker[0][7]} голосов\nСсылка  - {checker[0][8]}"
+                                our_film = f"---Сериал---\n▶{checker[0][1]}\n\n✓Жанры - {prod_actor_genre[2]}" \
+                                           f"\n✓Год премьеры - {checker[0][3]}\n✓Рейтинг - " \
+                                           f"{checker[0][5]}\n✓Продолжительность - {checker[0][6]} мин\n" \
+                                           f"✓Количество голосов imdb - {checker[0][7]}\n\n" \
+                                           f"🎬Продюсер - {prod_actor_genre[0]}\n✪Актеры - {prod_actor_genre[1]}\n\n" \
+                                           f"Ссылка  - {checker[0][8]}"
+                                break
+                            else:
+                                random_film = random.choices(films_for_categories)
+                        send_message(peer_id=peer_id_in, message='Окей, вот твой сериал:\n'
+                                                                 f'{our_film}',
+                                     keyboard=keyboard)
+
+                    elif film_or_serial == 300:
+                        db = get_connection()
+                        cursor = db.cursor()
+                        selector_for_genre = ('SELECT * FROM genre_movie WHERE genre_id = %s')
+                        cursor.execute(selector_for_genre, (genre_id,))
+                        films_for_categories = [x[1] for x in cursor.fetchall()]
+                        random_film = random.choices(films_for_categories)
+                        while True:
+                            selector = ('SELECT * FROM movie WHERE premier > 2001 and rating > 6 and type_id = 2 and votes > 25000 and duration > 0 and id = %s')
+                            film = random_film[0]
+                            cursor.execute(selector, (film,))
+                            checker = cursor.fetchall()
+                            if len(checker) > 0:
+                                prod_actor_genre = actors_producers_genres(film)
+                                our_film = f"---Сериал---\n▶{checker[0][1]}\n\n✓Жанры - {prod_actor_genre[2]}" \
+                                           f"\n✓Год премьеры - {checker[0][3]}\n✓Последней сезон - {checker[0][4]}" \
+                                           f"\n✓Рейтинг - " \
+                                           f"{checker[0][5]}\n✓Продолжительность - {checker[0][6]} мин\n" \
+                                           f"✓Количество голосов imdb - {checker[0][7]}\n\n" \
+                                           f"🎬Продюсер - {prod_actor_genre[0]}\n✪Актеры - {prod_actor_genre[1]}\n\n" \
+                                           f"Ссылка  - {checker[0][8]}"
                                 break
                             else:
                                 random_film = random.choices(films_for_categories)
