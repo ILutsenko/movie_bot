@@ -351,12 +351,12 @@ class SetSettings():
         self.second_genre = sc_genre,
         self.sorting = sort
         users_s[user_id_class] = {
-            'start_year': self.start_year,
-            'end_year': self.end_year,
-            'min_rating': self.min_rating,
-            'max_rating': self.max_rating,
-            'first_genre': self.first_genre,
-            'second_genre': self.second_genre,
+            'start_year': self.start_year[0],
+            'end_year': self.end_year[0],
+            'min_rating': self.min_rating[0],
+            'max_rating': self.max_rating[0],
+            'first_genre': self.first_genre[0],
+            'second_genre': self.second_genre[0],
             'sorting': self.sorting
         }
 
@@ -378,8 +378,8 @@ while True:
                 print('_' * 30)
 
                 if user_settings.get(user_id) == None:
-                    user_settings[user_id] = SetSettings(user_id)
-                    user_settings[user_id].set_settings(user_id, min_year, max_year, min_rating, max_rating, genre_id,
+                    user = SetSettings(user_id)
+                    user.set_settings(user_id, min_year, max_year, min_rating, max_rating, genre_id,
                                                         second_genre_id, kind_of_sorting, user_settings)
 
                 try:
@@ -512,25 +512,33 @@ while True:
                                220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232]:
 
                     if pemp == 'start':
-                        if min_year >= max_year:
+                        if payload + 1788 >= user_settings[user_id]["end_year"]:
+                            print(user_settings[user_id]["end_year"])
                             send_message(peer_id=peer_id_in, message=f'Минимальный год не может быть больше '
                                                                      f'или равным максимальному году, попробуйте '
                                                                      f'ввести год корректно\n'
                                                                      f'Год, который выбран как максимальный '
-                                                                     f'-{max_year}', keyboard=keyboard)
+                                                                     f'-{user_settings[user_id]["end_year"]}',
+                                         keyboard=keyboard)
                         else:
-                            min_year = payload + 1788
-                            send_message(peer_id=peer_id_in, message=f'Минимальный год успешно выбран - {min_year}')
+                            user_settings[user_id]["start_year"] = payload + 1788
+                            print(user_settings[user_id]["start_year"])
+                            send_message(peer_id=peer_id_in, message=f'Минимальный год успешно выбран -'
+                                                                     f' {user_settings[user_id]["start_year"]}')
 
                     elif pemp == 'end':
-                        if max_year <= min_year:
+                        print(user_settings[user_id]["start_year"])
+                        print(payload + 1788)
+                        if payload + 1788 <= user_settings[user_id]["start_year"]:
                             send_message(peer_id=peer_id_in, message=f'Максимальный год не может быть меньше '
                                                                      f'или равным минимальному году, попробуйте '
                                                                      f'Год, который выбран как минимальный '
-                                                                     f'-{min_year}', keyboard=keyboard)
+                                                                     f'-{user_settings[user_id]["start_year"]}',
+                                         keyboard=keyboard)
                         else:
-                            max_year = payload + 1788
-                            send_message(peer_id=peer_id_in, message=f'Максимальный год успешно выбран - {max_year}')
+                            user_settings[user_id]["end_year"] = payload + 1788
+                            send_message(peer_id=peer_id_in, message=f'Максимальный год успешно выбран - '
+                                                                     f'{user_settings[user_id]["end_year"]}')
 
                 elif payload == 99:
                     send_message(peer_id=peer_id_in, message='Открываем следующую страницу: ',
@@ -560,9 +568,10 @@ while True:
 
                 # Если ответ по жанру есть в списке - присваиваем жанр. Temp - различие для клавиатуры
                 elif payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'for_21':
-                    genre_id = payload - 6
+                    user_settings[user_id]["first_genre"] = list_of_genres[payload - 6]["Genre name"]
                     send_message(peer_id=peer_id_in,
-                                 message=f'Жанр был успешно выбран - {list_of_genres[genre_id]["Genre name"]}.\n\n'
+                                 message=f'Жанр был успешно выбран - '
+                                         f'{user_settings[user_id]["first_genre"]}.\n\n'
                                          'При выборе жанра можно несколько раз нажимать на указанные'
                                          ' кнопки с цифрами, если Вы решили изменить свое решение',
                                  keyboard=keyboard)
@@ -591,20 +600,38 @@ while True:
                 # Если число по рейтингу есть - присваиваем значения min_rating и max_rating
                 if payload in [39, 40, 41, 42, 43, 44, 45, 46, 47, 48]:
                     if temp == 'min':
-                        min_rating = payload - 38
-                        send_message(peer_id=peer_id_in,
-                                     message=f'Минимальный рейтинг успешно изменен на {min_rating}\n'
-                                             f'Можно вернуться в меню поиска чтобы настроить остальные фильтры или выбрать '
-                                             f'рейтинг еще раз из этого меню, просто нажав на цифру',
-                                     keyboard=keyboard)
+                        if payload - 38 >= user_settings[user_id]["max_rating"]:
+                            send_message(peer_id=peer_id_in,
+                                         message=f'Минимальный рейтинг нельзя выставить больше или равным '
+                                                 f'максимальному. Ваш максимальный рейтинг - '
+                                                 f'{user_settings[user_id]["max_rating"]}',
+                                         keyboard=keyboard)
+                        else:
+                            user_settings[user_id]["min_rating"] = payload - 38
+                            send_message(peer_id=peer_id_in,
+                                         message=f'Минимальный рейтинг успешно изменен на '
+                                                 f'{user_settings[user_id]["min_rating"]}\n'
+                                                 f'Можно вернуться в меню поиска чтобы настроить '
+                                                 f'остальные фильтры или выбрать '
+                                                 f'рейтинг еще раз из этого меню, просто нажав на цифру',
+                                         keyboard=keyboard)
 
                     elif temp == 'max':
-                        max_rating = payload - 38
-                        send_message(peer_id=peer_id_in,
-                                     message=f'Максимальный рейтинг успешно изменен на {max_rating}\n'
-                                             f'Можно вернуться в меню поиска чтобы настроить остальные фильтры или выбрать '
-                                             f'рейтинг еще раз из этого меню, просто нажав на цифру',
-                                     keyboard=keyboard)
+                        if payload - 38 <= user_settings[user_id]["min_rating"]:
+                            send_message(peer_id=peer_id_in,
+                                         message=f'Максимальный рейтинг нельзя выставить меньше или равным '
+                                                 f'минимальному. Ваш минимальный рейтинг - '
+                                                 f'{user_settings[user_id]["min_rating"]}',
+                                         keyboard=keyboard)
+                        else:
+                            user_settings[user_id]["max_rating"] = payload - 38
+                            send_message(peer_id=peer_id_in,
+                                         message=f'Максимальный рейтинг успешно изменен на '
+                                                 f'{user_settings[user_id]["max_rating"]}\n'
+                                                 f'Можно вернуться в меню поиска чтобы настроить '
+                                                 f'остальные фильтры или выбрать '
+                                                 f'рейтинг еще раз из этого меню, просто нажав на цифру',
+                                         keyboard=keyboard)
 
 
                 # Выбор сортировки
@@ -626,15 +653,15 @@ while True:
                 # Определяем как будем сортировать
                 elif payload in [70, 71, 72, 73]:
                     if payload == 70:
-                        kind_of_sorting = 'По году'
+                        user_settings[user_id]["sorting"] = 'По году'
                     elif payload == 71:
-                        kind_of_sorting = 'По рейтингу'
+                        user_settings[user_id]["sorting"] = 'По рейтингу'
                     elif payload == 72:
-                        kind_of_sorting = 'По году и рейтингу'
+                        user_settings[user_id]["sorting"] = 'По году и рейтингу'
                     else:
-                        kind_of_sorting = 'По количеству голосов imdb'
+                        user_settings[user_id]["sorting"] = 'По количеству голосов imdb'
                     send_message(peer_id=peer_id_in, message='Тип сортировки изменен на: '
-                                                             f'{kind_of_sorting}\n'
+                                                             f'{user_settings[user_id]["sorting"]}\n'
                                                              f'Изменить сортировку можно в этом же меню, для этого просто'
                                                              f' нажмите на нужную сортировку\n'
                                                              f'Для перехода обратно в меню фильтров нажмите "В меню поиска"'
@@ -649,9 +676,10 @@ while True:
 
                 # Если ответ по жанру есть в списке - присваиваем жанр. Temp - различие для клавиатуры
                 elif payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] and temp == 'for_56':
-                    second_genre_id = payload - 6
+                    user_settings[user_id]["second_genre"] = list_of_genres[payload - 6]["Genre name"]
                     send_message(peer_id=peer_id_in,
-                                 message=f'Второй жанр был успешно выбран - {list_of_genres[second_genre_id]["Genre name"]}.\n\n'
+                                 message=f'Второй жанр был успешно выбран - '
+                                         f'{user_settings[user_id]["second_genre"]}.\n\n'
                                          'При выборе жанра можно несколько раз нажимать на указанные'
                                          ' кнопки с цифрами, если Вы решили изменить свое решение',
                                  keyboard=keyboard)
@@ -660,6 +688,7 @@ while True:
                     send_message(peer_id=peer_id_in, message='Меню топов',
                                  keyboard=keyboard)
 
+                # Выводим топ 100 фильмов и топ 100 сериалов по всем жанрам
                 elif payload in [61, 62, 63, 64, 65]:
                     if payload == 61:
                         film_counter = 1
@@ -709,25 +738,17 @@ while True:
                             if serial_counter > 100:
                                 break
 
+                # Показать выбранную настройку
                 if payload == 55:
-                    try:
-                        genre_id = int(genre_id)
-                        genre_id_for_answer = list_of_genres[genre_id]["Genre name"]
-                    except:
-                        genre_id_for_answer = 'Не выбран'
-
-                    try:
-                        second_genre_id = int(second_genre_id)
-                        second_genre_id_for_answer = list_of_genres[second_genre_id]['Genre name']
-                    except:
-                        second_genre_id_for_answer = 'Не выбран'
 
                     send_message(peer_id=peer_id_in,
-                                 message=f'Рейтинг от {min_rating} до {max_rating}\n'
-                                         f'Год от {min_year} до {max_year}\n'
-                                         f'Жанр - {genre_id_for_answer}\n'
-                                         f'Второй жанр - {second_genre_id_for_answer}\n'
-                                         f'Вид сортировки - {kind_of_sorting}',
+                                 message=f'Рейтинг от {user_settings[user_id]["min_rating"]} '
+                                         f'до {user_settings[user_id]["max_rating"]}\n'
+                                         f'Год от {user_settings[user_id]["start_year"]} '
+                                         f'до {user_settings[user_id]["end_year"]}\n'
+                                         f'Жанр - {user_settings[user_id]["first_genre"]}\n'
+                                         f'Второй жанр - {user_settings[user_id]["second_genre"]}\n'
+                                         f'Вид сортировки - {user_settings[user_id]["sorting"]}',
                                  keyboard=keyboard)
 
                 vk.messages.markAsRead(peer_id=peer_id_in)
