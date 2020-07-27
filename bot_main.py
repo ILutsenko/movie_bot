@@ -8,6 +8,13 @@ from bot_genres import category_list, list_of_genres
 from datetime import datetime
 
 
+def get_key(d, value):
+    for k, v in d.items():
+        for j, m in v.items():
+            if m == value:
+                return k
+
+
 def actors_producers_genres(film_id):
     selector_for_actors_func = ('SELECT * FROM actor_movie WHERE movie_id = %s')
     selector_for_producer_func = ('SELECT * FROM producer_movie WHERE movie_id = %s')
@@ -83,7 +90,7 @@ min_rating = 6
 max_rating = 10
 min_year = 2000
 max_year = 2020
-genre_id = 'Не выбран'
+genre_id = 'Ужасы'
 second_genre_id = 'Не выбран'
 kind_of_sorting = 'По кол-ву голосов imdb'
 user_settings = {}
@@ -479,7 +486,7 @@ class SetSettings():
             'max_rating': self.max_rating[0],
             'first_genre': self.first_genre[0],
             'second_genre': self.second_genre[0],
-            'sorting': self.sorting,
+            'sorting': self.sorting[0],
             'film_or_ser': self.film_or_serial
         }
 
@@ -951,7 +958,98 @@ while True:
                                                              'увидеть после поиска',
                                  keyboard=keyboard)
                 elif payload in [601, 602, 603, 604]:
-                    user_settings[user_id]['count_for_films'] = payload
+                    db_advanced = get_connection()
+                    cur_advanced = db_advanced.cursor()
+                    if payload == 601:
+                        user_settings[user_id]['count_for_films'] = payload - 600
+                    elif payload == 602:
+                        user_settings[user_id]['count_for_films'] = payload - 597
+                    elif payload == 603:
+                        user_settings[user_id]['count_for_films'] = payload - 593
+                    elif payload == 604:
+                        user_settings[user_id]['count_for_films'] = payload - 579
+
+                    if user_settings[user_id]['second_genre'] != 'Не выбран':
+                        advanced_selector = ('SELECT * FROM movie INNER JOIN genre_movie ON movie.id = '
+                                             'genre_movie.movie_id WHERE genre_id IN (%s, %s) group by movie_id '
+                                             'having count(*) = 2 and %s <= rating and rating <= %s and '
+                                             '%s <= premier and premier <= %s and votes > 25000 LIMIT %s')
+                        question = (get_key(list_of_genres, user_settings[user_id]['first_genre']),
+                                    get_key(list_of_genres, user_settings[user_id]['second_genre']),
+                                    user_settings[user_id]['min_rating'], user_settings[user_id]['max_rating'],
+                                    user_settings[user_id]['start_year'], user_settings[user_id]['end_year'],
+                                    user_settings[user_id]['count_for_films'])
+                        cur_advanced.execute(advanced_selector, question)
+                        movies = cur_advanced.fetchall()
+                    elif user_settings[user_id]['second_genre'] == 'Не выбран':
+                        advanced_selector = ('SELECT * FROM movie INNER JOIN genre_movie ON movie.id = '
+                                             'genre_movie.movie_id WHERE genre_id = %s and %s <= rating and '
+                                             'rating <= %s and %s <= premier and premier <= %s and votes > 25000 '
+                                             'LIMIT %s')
+                        question = (get_key(list_of_genres, user_settings[user_id]['first_genre']),
+                                    user_settings[user_id]['min_rating'], user_settings[user_id]['max_rating'],
+                                    user_settings[user_id]['start_year'], user_settings[user_id]['end_year'],
+                                    user_settings[user_id]['count_for_films'])
+                        cur_advanced.execute(advanced_selector, question)
+                        movies = cur_advanced.fetchall()
+
+                    if user_settings[user_id]['sorting'] == 'По году':
+                        movies.sort(key=lambda x: x[3], reverse=True)
+                        movies = movies[:100]
+                        movies.reverse()
+
+                    elif user_settings[user_id]['sorting'] == 'По рейтингу':
+                        movies.sort(key=lambda x: x[5], reverse=True)
+                        movies = movies[:100]
+                        movies.reverse()
+
+                    elif user_settings[user_id]['sorting'] == 'По году и рейтингу':
+                        movies.sort(key=lambda x: (x[5], x[3]), reverse=True)
+                        movies = movies[:100]
+                        movies.reverse()
+
+                    elif user_settings[user_id]['sorting'] == 'По кол-ву голосов imdb':
+                        movies.sort(key=lambda x: x[7], reverse=True)
+                        movies = movies[:100]
+                        movies.reverse()
+
+                    our_counter = 1
+                    if len(movies) < user_settings[user_id]['count_for_films']:
+                        outer_counter = len(movies)
+                    else:
+                        outer_counter = user_settings[user_id]['count_for_films']
+                    if outer_counter <= 25:
+                        adv_search = ''
+                        for film in movies:
+                            adv_search += f"{outer_counter}-----{film[1]}-----\n"
+                            adv_search += f'✓Рейтинг: {film[5]}\n'
+                            adv_search += f'✓Год: {film[3]}\n'
+                            adv_search += f'✓Количество голосов: {film[7]}\n\n'
+                            outer_counter -= 1
+                            our_counter += 1
+                        send_message(peer_id=peer_id_in, message=f'{adv_search}',
+                                     keyboard=keyboard)
+                        adv_search = ''
+
+                    elif our_counter > 25:
+                        outer_counter = user_settings[user_id]['count_for_films']
+                        our_counter = 1
+                        adv_search = ''
+                        for film in movies:
+                            adv_search += f"{outer_counter}-----{film[1]}-----\n"
+                            adv_search += f'✓Рейтинг: {film[5]}\n'
+                            adv_search += f'✓Год: {film[3]}\n'
+                            adv_search += f'✓Количество голосов: {film[7]}\n\n'
+                            outer_counter -= 1
+                            our_counter += 1
+                        if our_counter % 25 == 0:
+                            send_message(peer_id=peer_id_in, message=f'{adv_search}',
+                                         keyboard=keyboard)
+                            adv_search = ''
+                        if outer_counter == 0:
+                            break
+
+                print(user_settings)
 
                 vk.messages.markAsRead(peer_id=peer_id_in)
 
