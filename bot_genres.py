@@ -11,7 +11,7 @@ list_of_genres = {
             'code': 'action'},
         6: {'Genre name': 'Триллер',
             'code': 'thriller'},
-        7: {'Genre name': 'Драммы',
+        7: {'Genre name': 'Драмы',
             'code': 'drama'},
         8: {'Genre name': 'Детективы',
             'code': 'mystery'},

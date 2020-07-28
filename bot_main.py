@@ -879,27 +879,41 @@ while True:
                 # Изменение первого и второго жанра
                 elif payload in [27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38]:
                     if user_settings[user_id]['choose_genre'] == 'first':
-                        user_settings[user_id]["first_genre"] = list_of_genres[payload - 26]["Genre name"]
-                        send_message(peer_id=peer_id_in,
-                                     message=f'Первый жанр был успешно выбран - '
-                                             f'{user_settings[user_id]["first_genre"]}.\n\n'
-                                             'При выборе жанра можно несколько раз нажимать на указанные'
-                                             ' кнопки с цифрами, если Вы решили изменить свое решение. '
-                                             'Если же жанр выбран'
-                                             ' правильно - можно вернуться к настройкам остальных фильтров нажам на '
-                                             '"В меню поиска"',
-                                     keyboard=keyboard)
+                        if list_of_genres[payload - 26]['Genre name'] == user_settings[user_id]["second_genre"]:
+                            send_message(peer_id=peer_id_in,
+                                         message=f'Этот жанр уже используется для "Второго жанра". Измените его чтобы '
+                                                 f'продолжить или выберете "Не выбран"',
+                                         keyboard=keyboard)
+                        else:
+                            user_settings[user_id]["first_genre"] = list_of_genres[payload - 26]["Genre name"]
+                            send_message(peer_id=peer_id_in,
+                                         message=f'Первый жанр был успешно выбран - '
+                                                 f'{user_settings[user_id]["first_genre"]}.\n\n'
+                                                 'При выборе жанра можно несколько раз нажимать на указанные'
+                                                 ' кнопки с цифрами, если Вы решили изменить свое решение. '
+                                                 'Если же жанр выбран'
+                                                 ' правильно - можно вернуться к настройкам остальных фильтров нажам на '
+                                                 '"В меню поиска"',
+                                         keyboard=keyboard)
 
                     elif user_settings[user_id]['choose_genre'] == 'second':
-                        user_settings[user_id]["second_genre"] = list_of_genres[payload - 26]["Genre name"]
-                        send_message(peer_id=peer_id_in,
-                                     message=f'Второй жанр был успешно выбран - '
-                                             f'{user_settings[user_id]["second_genre"]}.\n\n'
-                                             'При выборе жанра можно несколько раз нажимать на указанные'
-                                             ' кнопки с цифрами, если Вы решили изменить свое решение. '
-                                             'Если жанр выбран '
-                                             'правильно - нажмите "В меню поиска" для настройки остальных фильтров',
-                                     keyboard=keyboard)
+                        if user_settings[user_id]["first_genre"] == list_of_genres[payload - 26]['Genre name']:
+                            user_settings[user_id]["second_genre"] = 'Не выбран'
+                            send_message(peer_id=peer_id_in,
+                                         message=f'Этот жанр уже используется для "Первого жанра". Измените его чтобы '
+                                                 f'продолжить или выберете "Не выбран"',
+                                         keyboard=keyboard)
+                        else:
+                            user_settings[user_id]["second_genre"] = list_of_genres[payload - 26]["Genre name"]
+                            send_message(peer_id=peer_id_in,
+                                         message=f'Второй жанр был успешно выбран - '
+                                                 f'{user_settings[user_id]["second_genre"]}.\n\n'
+                                                 'При выборе жанра можно несколько раз нажимать на указанные'
+                                                 ' кнопки с цифрами, если Вы решили изменить свое решение. '
+                                                 'Если жанр выбран '
+                                                 'правильно - нажмите "В меню поиска" для настройки остальных фильтров',
+                                         keyboard=keyboard)
+
 
                 # Сообщение изменения сортировки
                 if payload == 54:
