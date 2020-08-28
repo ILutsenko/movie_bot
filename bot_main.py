@@ -121,12 +121,50 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('Завершенный сериал', VkKeyboardColor.PRIMARY, payload='300')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload in [5, 6, 300]:
         """Цифры для выбора в рандоме"""
 
+        if payload == 5 or film_or_serial == 5:
+            keyboard = VkKeyboard(one_time=False)
+            keyboard.add_button('Рандомный фильм', VkKeyboardColor.POSITIVE, payload='555')
+            keyboard.add_line()
+            keyboard.add_button('Рандомный фильм по жанру', VkKeyboardColor.POSITIVE, payload='556')
+            keyboard.add_line()
+            keyboard.add_button('Переключить на сериалы', VkKeyboardColor.DEFAULT, payload='6')
+            keyboard.add_line()
+            keyboard.add_button('Переключить на завершенные сериалы', VkKeyboardColor.DEFAULT, payload='300')
+            keyboard.add_line()
+            keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
+            return keyboard.get_keyboard()
+        elif payload == 6 or film_or_serial == 6:
+            keyboard = VkKeyboard(one_time=False)
+            keyboard.add_button('Рандомный сериал', VkKeyboardColor.POSITIVE, payload='666')
+            keyboard.add_line()
+            keyboard.add_button('Рандомный сериал по жанру', VkKeyboardColor.POSITIVE, payload='667')
+            keyboard.add_line()
+            keyboard.add_button('Переключить на фильмы', VkKeyboardColor.DEFAULT, payload='5')
+            keyboard.add_line()
+            keyboard.add_button('Переключить на завершенные сериалы', VkKeyboardColor.DEFAULT, payload='300')
+            keyboard.add_line()
+            keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
+            return keyboard.get_keyboard()
+        elif payload == 300 or film_or_serial == 300:
+            keyboard = VkKeyboard(one_time=False)
+            keyboard.add_button('Рандомный зав. сериал', VkKeyboardColor.POSITIVE, payload='777')
+            keyboard.add_line()
+            keyboard.add_button('Рандомный зав. сериал по жанру', VkKeyboardColor.POSITIVE, payload='778')
+            keyboard.add_line()
+            keyboard.add_button('Переключить на фильмы', VkKeyboardColor.DEFAULT, payload='5')
+            keyboard.add_line()
+            keyboard.add_button('Переключить на сериалы', VkKeyboardColor.DEFAULT, payload='6')
+            keyboard.add_line()
+            keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
+            return keyboard.get_keyboard()
+
+    elif payload in [556, 667, 778]:
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload='7')
         keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload='8')
@@ -142,36 +180,22 @@ def our_keyboard():
         keyboard.add_button('10', VkKeyboardColor.PRIMARY, payload='16')
         keyboard.add_button('11', VkKeyboardColor.PRIMARY, payload='17')
         keyboard.add_button('12', VkKeyboardColor.PRIMARY, payload='18')
-        if payload == 5 or film_or_serial == 5:
+        keyboard.add_line()
+        if payload == 556:
+            keyboard.add_button('Назад к выбору', VkKeyboardColor.NEGATIVE, payload='5')
             keyboard.add_line()
-            keyboard.add_button('Переключить на сериалы', VkKeyboardColor.DEFAULT, payload='6')
+            keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
+        elif payload == 667:
+            keyboard.add_button('Назад к выбору', VkKeyboardColor.NEGATIVE, payload='6')
             keyboard.add_line()
-            keyboard.add_button('Переключить на завершенные сериалы', VkKeyboardColor.DEFAULT, payload='300')
+            keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
+        elif payload == 778:
+            keyboard.add_button('Назад к выбору', VkKeyboardColor.NEGATIVE, payload='300')
             keyboard.add_line()
-            keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
-            return keyboard.get_keyboard()
-        elif payload == 6 or film_or_serial == 6:
-            keyboard.add_line()
-            keyboard.add_button('Переключить на фильмы', VkKeyboardColor.DEFAULT, payload='5')
-            keyboard.add_line()
-            keyboard.add_button('Переключить на завершенные сериалы', VkKeyboardColor.DEFAULT, payload='300')
-            keyboard.add_line()
-            keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
-            return keyboard.get_keyboard()
-        elif payload == 300 or film_or_serial == 300:
-            keyboard.add_line()
-            keyboard.add_button('Переключить на фильмы', VkKeyboardColor.DEFAULT, payload='5')
-            keyboard.add_line()
-            keyboard.add_button('Переключить на сериалы', VkKeyboardColor.DEFAULT, payload='6')
-            keyboard.add_line()
-            keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
-            return keyboard.get_keyboard()
-        else:
-            keyboard.add_line()
-            keyboard.add_button('Назад в меню поиска', VkKeyboardColor.PRIMARY, payload='3')
-            keyboard.add_line()
-            keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
-            return keyboard.get_keyboard()
+            keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
+
+
+        return keyboard.get_keyboard()
 
     elif payload in [100, 61, 65]:
         keyboard = VkKeyboard(one_time=False)
@@ -183,7 +207,7 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('Топ 100 сериалов по одному жанру', VkKeyboardColor.PRIMARY, payload='62')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 62:
@@ -207,7 +231,7 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('В меню топов', VkKeyboardColor.DEFAULT, payload='100')
         keyboard.add_line()
-        keyboard.add_button('В главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('В главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 64:
@@ -231,7 +255,7 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('В меню топов', VkKeyboardColor.DEFAULT, payload='100')
         keyboard.add_line()
-        keyboard.add_button('В главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('В главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 3:
@@ -244,13 +268,14 @@ def our_keyboard():
         keyboard.add_button('Выбрать жанр', VkKeyboardColor.PRIMARY, payload='21')
         keyboard.add_button('Второй жанр', VkKeyboardColor.PRIMARY, payload='56')
         keyboard.add_line()
+        #keyboard.add_button('Выбрать категорию', VkKeyboardColor.PRIMARY, payload='544')
         keyboard.add_button('Выбрать сортировку', VkKeyboardColor.PRIMARY, payload='54')
         keyboard.add_line()
         keyboard.add_button('Показать выбранные', VkKeyboardColor.PRIMARY, payload='543')
         keyboard.add_line()
         keyboard.add_button('Выбранные настройки', VkKeyboardColor.DEFAULT, payload='55')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 19:
@@ -262,7 +287,7 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('В меню поиска', VkKeyboardColor.PRIMARY, payload='3')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 23 or payload == 24:
@@ -300,7 +325,7 @@ def our_keyboard():
             keyboard.add_line()
         keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload='3')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 99:
@@ -336,7 +361,7 @@ def our_keyboard():
             keyboard.add_line()
         keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload='3')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 20:
@@ -348,7 +373,7 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('В меню поиска', VkKeyboardColor.PRIMARY, payload='3')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload in [25, 26]:
@@ -377,7 +402,7 @@ def our_keyboard():
             keyboard.add_line()
         keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload='3')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 21:
@@ -403,7 +428,7 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload='3')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 56:
@@ -429,7 +454,7 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload='3')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 54:
@@ -444,7 +469,7 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload='3')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
     elif payload == 543:
@@ -456,7 +481,7 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('В меню поиска', VkKeyboardColor.DEFAULT, payload='3')
         keyboard.add_line()
-        keyboard.add_button('Главное меню', VkKeyboardColor.DEFAULT, payload='0')
+        keyboard.add_button('Главное меню', VkKeyboardColor.NEGATIVE, payload='0')
         return keyboard.get_keyboard()
 
 
@@ -535,24 +560,104 @@ while True:
                                  keyboard=keyboard)
 
                 # Выбор жанра для рандомного поиска
-                elif payload in [5, 6, 300]:
+                elif payload in [556, 667, 778]:
                     send_message(peer_id=peer_id_in, message='Теперь нужно выбрать жанр:\n'
                                                              f'{category_list}',
                                  keyboard=keyboard)
-                    user_settings[user_id]['film_or_ser'] = payload
+                    if payload == 556:
+                        user_settings[user_id]['film_or_ser'] = 5
+                    elif payload == 667:
+                        user_settings[user_id]['film_or_ser'] = 6
+                    elif payload == 778:
+                        user_settings[user_id]['film_or_ser'] = 300
 
                 # Если переключаем категории в рандомном поиске
-                if payload in [5, 6, 300]:
+                if payload in [5, 6, 300, 555, 666, 777]:
                     keyboard_for_change = our_keyboard()
                     if payload == 5:
                         named = 'фильмы'
+                        send_message(peer_id=peer_id_in, message=f'Категория успешно изменена на "{named}"',
+                                     keyboard=keyboard_for_change)
+                        user_settings[user_id]['film_or_ser'] = payload
                     elif payload == 6:
                         named = 'сериалы'
+                        send_message(peer_id=peer_id_in, message=f'Категория успешно изменена на "{named}"',
+                                     keyboard=keyboard_for_change)
+                        user_settings[user_id]['film_or_ser'] = payload
                     elif payload == 300:
                         named = 'завершенные сериалы'
-                    send_message(peer_id=peer_id_in, message=f'Категория успешно изменена на "{named}"',
-                                 keyboard=keyboard_for_change)
-                    user_settings[user_id]['film_or_ser'] = payload
+                        send_message(peer_id=peer_id_in, message=f'Категория успешно изменена на "{named}"',
+                                     keyboard=keyboard_for_change)
+                        user_settings[user_id]['film_or_ser'] = payload
+
+                    elif payload in [555, 666, 777]:
+                        genre_id_for_random_in_range = random.randint(1, 12)
+                        db = get_connection()
+                        cursor = db.cursor()
+
+                        if payload == 555:
+                            user_settings[user_id]['film_or_ser'] = 5
+                            selector_for_range = ('SELECT * FROM movie INNER JOIN genre_movie ON movie.id = '
+                                                  'genre_movie.movie_id '
+                                                  'WHERE genre_id = %s and rating > 7 and premier > 1998 '
+                                                  'and type_id = 0 and duration != 0 '
+                                                  'and votes > 25000 ORDER BY RAND() LIMIT 1')
+                            cursor.execute(selector_for_range, (genre_id_for_random_in_range,))
+                            checker = cursor.fetchall()
+                            prod_actor_genre = actors_producers_genres(checker[0][0])
+                            our_film = f"---Фильм---\n▶{checker[0][1]}\n\n✓Жанры - {prod_actor_genre[2]}" \
+                                       f"\n✓Год премьеры - {checker[0][3]}\n✓Рейтинг - " \
+                                       f"{checker[0][5]}\n✓Продолжительность - {checker[0][6]} мин\n" \
+                                       f"✓Количество голосов imdb - {checker[0][7]}\n\n" \
+                                       f"🎬Продюсер - {prod_actor_genre[0]}\n✪Актеры - {prod_actor_genre[1]}\n\n" \
+                                       f"Ссылка  - {checker[0][8]}"
+
+                            send_message(peer_id=peer_id_in, message=f'А вот и твой фильм:\n'
+                                                                     f'{our_film}',
+                                         keyboard=keyboard)
+                        elif payload == 666:
+                            user_settings[user_id]['film_or_ser'] = 6
+                            selector_for_range = ('SELECT * FROM movie INNER JOIN genre_movie ON movie.id = '
+                                                  'genre_movie.movie_id '
+                                                  'WHERE genre_id = %s and rating > 7 and premier > 1998 '
+                                                  'and type_id = 1 and duration != 0 '
+                                                  'and votes > 25000 ORDER BY RAND() LIMIT 1')
+                            cursor.execute(selector_for_range, (genre_id_for_random_in_range,))
+                            checker = cursor.fetchall()
+                            prod_actor_genre = actors_producers_genres(checker[0][0])
+                            our_film = f"---Сериал---\n▶{checker[0][1]}\n\n✓Жанры - {prod_actor_genre[2]}" \
+                                       f"\n✓Год премьеры - {checker[0][3]}\n✓Рейтинг - " \
+                                       f"{checker[0][5]}\n✓Продолжительность серии - {checker[0][6]} мин\n" \
+                                       f"✓Количество голосов imdb - {checker[0][7]}\n\n" \
+                                       f"🎬Продюсер - {prod_actor_genre[0]}\n✪Актеры - {prod_actor_genre[1]}\n\n" \
+                                       f"Ссылка  - {checker[0][8]}"
+
+                            send_message(peer_id=peer_id_in, message=f'А вот и твой сериал:\n'
+                                                                     f'{our_film}',
+                                         keyboard=keyboard)
+                        elif payload == 777:
+                            user_settings[user_id]['film_or_ser'] = 300
+                            selector_for_range = ('SELECT * FROM movie INNER JOIN genre_movie ON movie.id = '
+                                                  'genre_movie.movie_id '
+                                                  'WHERE genre_id = %s and rating > 7 and premier > 1998 '
+                                                  'and type_id = 2 and duration != 0 '
+                                                  'and votes > 25000 ORDER BY RAND() LIMIT 1')
+
+                            cursor.execute(selector_for_range, (genre_id_for_random_in_range, ))
+                            checker = cursor.fetchall()
+                            prod_actor_genre = actors_producers_genres(checker[0][0])
+                            our_film = f"---Завершенный сериал---\n▶{checker[0][1]}\n\n✓Жанры - {prod_actor_genre[2]}" \
+                                   f"\n✓Год премьеры - {checker[0][3]}\n✓Последней сезон - {checker[0][4]}" \
+                                   f"\n✓Рейтинг - " \
+                                   f"{checker[0][5]}\n✓Продолжительность серии - {checker[0][6]} мин\n" \
+                                   f"✓Количество голосов imdb - {checker[0][7]}\n\n" \
+                                   f"🎬Продюсер - {prod_actor_genre[0]}\n✪Актеры - {prod_actor_genre[1]}\n\n" \
+                                   f"Ссылка  - {checker[0][8]}"
+
+                            send_message(peer_id=peer_id_in, message=f'А вот и твой завершенный сериал:\n'
+                                                                     f'{our_film}',
+                                         keyboard=keyboard)
+
 
                 # Если ответ на выбор жанра правильный и есть в списке. Показываем рандомные фильмы / сериалы
                 if payload in [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]:
@@ -988,7 +1093,8 @@ while True:
                     if user_settings[user_id]['second_genre'] != 'Не выбран':
                         advanced_selector = ('SELECT * FROM movie INNER JOIN genre_movie ON movie.id = '
                                              'genre_movie.movie_id WHERE genre_id IN (%s, %s) group by movie_id '
-                                             'having count(*) = 2 and %s <= rating and rating <= %s and '
+                                             'having count(*) = 2 and duration > 9 and %s '
+                                             '<= rating and rating <= %s and '
                                              '%s <= premier and premier <= %s and votes > 25000 LIMIT %s')
                         question = (get_key(list_of_genres, user_settings[user_id]['first_genre']),
                                     get_key(list_of_genres, user_settings[user_id]['second_genre']),
@@ -1000,7 +1106,8 @@ while True:
                     elif user_settings[user_id]['second_genre'] == 'Не выбран':
                         advanced_selector = ('SELECT * FROM movie INNER JOIN genre_movie ON movie.id = '
                                              'genre_movie.movie_id WHERE genre_id = %s and %s <= rating and '
-                                             'rating <= %s and %s <= premier and premier <= %s and votes > 25000 '
+                                             'rating <= %s and duration > 9 and %s <= premier and '
+                                             'premier <= %s and votes > 25000 '
                                              'LIMIT %s')
                         question = (get_key(list_of_genres, user_settings[user_id]['first_genre']),
                                     user_settings[user_id]['min_rating'], user_settings[user_id]['max_rating'],
