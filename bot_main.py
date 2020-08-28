@@ -107,6 +107,8 @@ def our_keyboard():
         keyboard.add_line()
         keyboard.add_button('Продвинутый поиск', VkKeyboardColor.PRIMARY, payload='3')
         keyboard.add_line()
+        keyboard.add_button('Лучшие подборки', VkKeyboardColor.PRIMARY, payload='4')
+        keyboard.add_line()
         keyboard.add_button('Топ 100 фильмов или сериалов', VkKeyboardColor.PRIMARY, payload='100')
         return keyboard.get_keyboard()
 
