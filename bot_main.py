@@ -125,7 +125,7 @@ def our_keyboard():
         return keyboard.get_keyboard()
 
     elif payload in [5, 6, 300]:
-        """Цифры для выбора в рандоме"""
+        """Изменение или выбор фильма/сериала"""
 
         if payload == 5 or film_or_serial == 5:
             keyboard = VkKeyboard(one_time=False)
@@ -165,6 +165,8 @@ def our_keyboard():
             return keyboard.get_keyboard()
 
     elif payload in [556, 667, 778]:
+        """Цифры для выбора в рандоме"""
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('1', VkKeyboardColor.PRIMARY, payload='7')
         keyboard.add_button('2', VkKeyboardColor.PRIMARY, payload='8')
@@ -198,6 +200,8 @@ def our_keyboard():
         return keyboard.get_keyboard()
 
     elif payload in [100, 61, 65]:
+        """меню топов"""
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('Топ 100 фильмов', VkKeyboardColor.PRIMARY, payload='61')
         keyboard.add_line()
@@ -329,6 +333,8 @@ def our_keyboard():
         return keyboard.get_keyboard()
 
     elif payload == 99:
+        """Цифры для выбора года"""
+
         keyboard = VkKeyboard(one_time=False)
         keyboard.add_button('2005', VkKeyboardColor.PRIMARY, payload='217')
         keyboard.add_button('2006', VkKeyboardColor.PRIMARY, payload='218')
@@ -1021,7 +1027,6 @@ while True:
                                                  'правильно - нажмите "В меню поиска" для настройки остальных фильтров',
                                          keyboard=keyboard)
 
-
                 # Сообщение изменения сортировки
                 if payload == 54:
                     send_message(peer_id=peer_id_in,
@@ -1178,4 +1183,3 @@ while True:
 
     except Exception as error:
         print(error)
-
